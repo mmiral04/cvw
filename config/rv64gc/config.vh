@@ -189,6 +189,9 @@ localparam logic [63:0] SDC_RANGE        = 64'h00000FFF;
 localparam logic SPI_SUPPORTED = 1;
 localparam logic [63:0] SPI_BASE         = 64'h10040000;
 localparam logic [63:0] SPI_RANGE        = 64'h00000FFF;
+localparam logic ETH_SUPPORTED = 0;
+localparam logic [63:0] ETH_BASE         = 64'h00100000;
+localparam logic [63:0] ETH_RANGE        = 64'h00001FFF;
 
 // Bus Interface width
 localparam AHBW = (XLEN);
@@ -214,6 +217,7 @@ localparam PLIC_GPIO_ID = 32'd3;
 localparam PLIC_UART_ID = 32'd10;
 localparam PLIC_SPI_ID = 32'd6;
 localparam PLIC_SDC_ID = 32'd9;
+localparam PLIC_ETH_ID = 32'd4;
 
 // Branch prediction
 localparam logic BPRED_SUPPORTED = 1;

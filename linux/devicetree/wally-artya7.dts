@@ -51,6 +51,16 @@
     compatible = "simple-bus";
     ranges;
 
+   xilinx_emaclite: ethernet@100000 {
+        compatible = "xlnx,axi-ethernetlite-3.0", "xlnx,xps-ethernetlite-1.00.a";
+        interrupt-parent = <0x03>;
+        interrupts = <4>;
+        local-mac-address = [00 0a 35 00 00 00];
+        reg = <0x00 0x100000 0x00 0x2000>;
+        xlnx,rx-ping-pong = <0x1>;
+        xlnx,tx-ping-pong = <0x1>;
+    };
+
     refclk: refclk {
       #clock-cells = <0>;
       compatible = "fixed-clock";

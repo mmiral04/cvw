@@ -61,6 +61,8 @@ BPRED_SIZE          32'd12
 
 deriv fpgaArtyA7 fpga
 EXT_MEM_RANGE       64'h0FFFFFFF
+ETH_SUPPORTED       1
+ITLB_ENTRIES 32'd8
 
 deriv fpgagenesys2 fpga
 EXT_MEM_RANGE       64'h3FFFFFFF

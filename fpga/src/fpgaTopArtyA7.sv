@@ -37,7 +37,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
    input logic [3:0]   GPI,
    output logic [4:0]  GPO,
 
-   // UART Signals
+  // UART Signals
    input logic         UARTSin,
    output logic        UARTSout,
 
@@ -110,42 +110,179 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
   // GPIO Signals
   logic [31:0]    GPIOIN, GPIOOUT, GPIOEN;
 
+  // Ethernet Signals
+  logic            ETHIntr;
+  logic            phy_mdio_i, phy_mdio_o, phy_mdio_t;
+
   // AHB to AXI Bridge Signals
-  logic [3:0]      m_axi_awid;
-  logic [7:0]      m_axi_awlen;
-  logic [2:0]      m_axi_awsize;
-  logic [1:0]      m_axi_awburst;
-  logic [3:0]      m_axi_awcache;
-  logic [31:0]     m_axi_awaddr;
-  logic [2:0]      m_axi_awprot;
-  logic            m_axi_awvalid;
-  logic            m_axi_awready;
-  logic            m_axi_awlock;
-  logic [63:0]     m_axi_wdata;
-  logic [7:0]      m_axi_wstrb;
-  logic            m_axi_wlast;
-  logic            m_axi_wvalid;
-  logic            m_axi_wready;
-  logic [3:0]      m_axi_bid;
-  logic [1:0]      m_axi_bresp;
-  logic            m_axi_bvalid;
-  logic            m_axi_bready;
-  logic [3:0]      m_axi_arid;
-  logic [7:0]      m_axi_arlen;
-  logic [2:0]      m_axi_arsize;
-  logic [1:0]      m_axi_arburst;
-  logic [2:0]      m_axi_arprot;
-  logic [3:0]      m_axi_arcache;
-  logic            m_axi_arvalid;
-  logic [31:0]     m_axi_araddr;
-  logic            m_axi_arlock;
-  logic            m_axi_arready;
-  logic [3:0]      m_axi_rid;
-  logic [63:0]     m_axi_rdata;
-  logic [1:0]      m_axi_rresp;
-  logic            m_axi_rvalid;
-  logic            m_axi_rlast;
-  logic            m_axi_rready;
+  logic [3:0]      m0_axi_awid;
+  logic [7:0]      m0_axi_awlen;
+  logic [2:0]      m0_axi_awsize;
+  logic [1:0]      m0_axi_awburst;
+  logic [3:0]      m0_axi_awcache;
+  logic [31:0]     m0_axi_awaddr;
+  logic [2:0]      m0_axi_awprot;
+  logic            m0_axi_awvalid;
+  logic            m0_axi_awready;
+  logic            m0_axi_awlock;
+  logic [63:0]     m0_axi_wdata;
+  logic [7:0]      m0_axi_wstrb;
+  logic            m0_axi_wlast;
+  logic            m0_axi_wvalid;
+  logic            m0_axi_wready;
+  logic [3:0]      m0_axi_bid;
+  logic [1:0]      m0_axi_bresp;
+  logic            m0_axi_bvalid;
+  logic            m0_axi_bready;
+  logic [3:0]      m0_axi_arid;
+  logic [7:0]      m0_axi_arlen;
+  logic [2:0]      m0_axi_arsize;
+  logic [1:0]      m0_axi_arburst;
+  logic [2:0]      m0_axi_arprot;
+  logic [3:0]      m0_axi_arcache;
+  logic            m0_axi_arvalid;
+  logic [31:0]     m0_axi_araddr;
+  logic            m0_axi_arlock;
+  logic            m0_axi_arready;
+  logic [3:0]      m0_axi_rid;
+  logic [63:0]     m0_axi_rdata;
+  logic [1:0]      m0_axi_rresp;
+  logic            m0_axi_rvalid;
+  logic            m0_axi_rlast;
+  logic            m0_axi_rready;
+
+  // AXI crossbar output signals
+  // Master Interface 0
+  logic [3:0]      XBAR_m00_axi_awid;
+  logic [7:0]      XBAR_m00_axi_awlen;
+  logic [2:0]      XBAR_m00_axi_awsize;
+  logic [1:0]      XBAR_m00_axi_awburst;
+  logic [3:0]      XBAR_m00_axi_awcache;
+  logic [31:0]     XBAR_m00_axi_awaddr;
+  logic [2:0]      XBAR_m00_axi_awprot;
+  logic            XBAR_m00_axi_awvalid;
+  logic            XBAR_m00_axi_awready;
+  logic            XBAR_m00_axi_awlock;
+  logic [63:0]     XBAR_m00_axi_wdata;
+  logic [7:0]      XBAR_m00_axi_wstrb;
+  logic            XBAR_m00_axi_wlast;
+  logic            XBAR_m00_axi_wvalid;
+  logic            XBAR_m00_axi_wready;
+  logic [3:0]      XBAR_m00_axi_bid;
+  logic [1:0]      XBAR_m00_axi_bresp;
+  logic            XBAR_m00_axi_bvalid;
+  logic            XBAR_m00_axi_bready;
+  logic [3:0]      XBAR_m00_axi_arid;
+  logic [7:0]      XBAR_m00_axi_arlen;
+  logic [2:0]      XBAR_m00_axi_arsize;
+  logic [1:0]      XBAR_m00_axi_arburst;
+  logic [2:0]      XBAR_m00_axi_arprot;
+  logic [3:0]      XBAR_m00_axi_arcache;
+  logic            XBAR_m00_axi_arvalid;
+  logic [31:0]     XBAR_m00_axi_araddr;
+  logic            XBAR_m00_axi_arlock;
+  logic            XBAR_m00_axi_arready;
+  logic [3:0]      XBAR_m00_axi_rid;
+  logic [63:0]     XBAR_m00_axi_rdata;
+  logic [1:0]      XBAR_m00_axi_rresp;
+  logic            XBAR_m00_axi_rvalid;
+  logic            XBAR_m00_axi_rlast;
+  logic            XBAR_m00_axi_rready;
+
+  // Master Interface 1
+  logic [3:0]      XBAR_m01_axi_awid;
+  logic [7:0]      XBAR_m01_axi_awlen;
+  logic [2:0]      XBAR_m01_axi_awsize;
+  logic [1:0]      XBAR_m01_axi_awburst;
+  logic [3:0]      XBAR_m01_axi_awcache;
+  logic [31:0]     XBAR_m01_axi_awaddr;
+  logic [2:0]      XBAR_m01_axi_awprot;
+  logic            XBAR_m01_axi_awvalid;
+  logic            XBAR_m01_axi_awready;
+  logic            XBAR_m01_axi_awlock;
+  logic [63:0]     XBAR_m01_axi_wdata;
+  logic [7:0]      XBAR_m01_axi_wstrb;
+  logic            XBAR_m01_axi_wlast;
+  logic            XBAR_m01_axi_wvalid;
+  logic            XBAR_m01_axi_wready;
+  logic [3:0]      XBAR_m01_axi_bid;
+  logic [1:0]      XBAR_m01_axi_bresp;
+  logic            XBAR_m01_axi_bvalid;
+  logic            XBAR_m01_axi_bready;
+  logic [3:0]      XBAR_m01_axi_arid;
+  logic [7:0]      XBAR_m01_axi_arlen;
+  logic [2:0]      XBAR_m01_axi_arsize;
+  logic [1:0]      XBAR_m01_axi_arburst;
+  logic [2:0]      XBAR_m01_axi_arprot;
+  logic [3:0]      XBAR_m01_axi_arcache;
+  logic            XBAR_m01_axi_arvalid;
+  logic [31:0]     XBAR_m01_axi_araddr;
+  logic            XBAR_m01_axi_arlock;
+  logic            XBAR_m01_axi_arready;
+  logic [3:0]      XBAR_m01_axi_rid;
+  logic [63:0]     XBAR_m01_axi_rdata;
+  logic [1:0]      XBAR_m01_axi_rresp;
+  logic            XBAR_m01_axi_rvalid;
+  logic            XBAR_m01_axi_rlast;
+  logic            XBAR_m01_axi_rready;
+
+  // AXI Signals going out of dwidth converter
+  logic [3:0]      axil_dwidth_awid;
+  logic [7:0]      axil_dwidth_awlen;
+  logic [2:0]      axil_dwidth_awsize;
+  logic [1:0]      axil_dwidth_awburst;
+  logic [3:0]      axil_dwidth_awcache;
+  logic [31:0]     axil_dwidth_awaddr;
+  logic [2:0]      axil_dwidth_awprot;
+  logic            axil_dwidth_awvalid;
+  logic            axil_dwidth_awready;
+  logic            axil_dwidth_awlock;
+  logic [31:0]     axil_dwidth_wdata;
+  logic [7:0]      axil_dwidth_wstrb;
+  logic            axil_dwidth_wlast;
+  logic            axil_dwidth_wvalid;
+  logic            axil_dwidth_wready;
+  logic [3:0]      axil_dwidth_bid;
+  logic [1:0]      axil_dwidth_bresp;
+  logic            axil_dwidth_bvalid;
+  logic            axil_dwidth_bready;
+  logic [3:0]      axil_dwidth_arid;
+  logic [7:0]      axil_dwidth_arlen;
+  logic [2:0]      axil_dwidth_arsize;
+  logic [1:0]      axil_dwidth_arburst;
+  logic [2:0]      axil_dwidth_arprot;
+  logic [3:0]      axil_dwidth_arcache;
+  logic            axil_dwidth_arvalid;
+  logic [31:0]     axil_dwidth_araddr;
+  logic            axil_dwidth_arlock;
+  logic            axil_dwidth_arready;
+  logic [3:0]      axil_dwidth_rid;
+  logic [31:0]     axil_dwidth_rdata;
+  logic [1:0]      axil_dwidth_rresp;
+  logic            axil_dwidth_rvalid;
+  logic            axil_dwidth_rlast;
+  logic            axil_dwidth_rready;
+
+  // AXI Signals going out of protocol converter
+  logic [31:0]     axil_awaddr;
+  logic [2:0]      axil_awprot;
+  logic            axil_awvalid;
+  logic            axil_awready;
+  logic [63:0]     axil_wdata;
+  logic [7:0]      axil_wstrb;
+  logic            axil_wvalid;
+  logic            axil_wready;
+  logic [1:0]      axil_bresp;
+  logic            axil_bvalid;
+  logic            axil_bready;
+  logic [31:0]     axil_araddr;
+  logic [2:0]      axil_arprot;
+  logic            axil_arvalid;
+  logic            axil_arready;
+  logic [63:0]     axil_rdata;
+  logic [1:0]      axil_rresp;
+  logic            axil_rvalid;
+  logic            axil_rready;
 
   // AXI Signals going out of Clock Converter
   logic [3:0]      BUS_axi_arregion;
@@ -258,7 +395,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
                     .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT,
                     .HTRANS, .HMASTLOCK, .HREADY, .TIMECLK(1'b0),
                     .GPIOIN, .GPIOOUT, .GPIOEN,
-                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall));
+                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ETHIntr, .ExternalStall(RVVIStall));
 
 
   // ahb lite to axi bridge
@@ -277,85 +414,309 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
      .s_ahb_hready_in(HREADY),
      .s_ahb_hrdata(HRDATAEXT),
      .s_ahb_hresp(HRESPEXT),
-     .m_axi_awid(m_axi_awid),
-     .m_axi_awlen(m_axi_awlen),
-     .m_axi_awsize(m_axi_awsize),
-     .m_axi_awburst(m_axi_awburst),
-     .m_axi_awcache(m_axi_awcache),
-     .m_axi_awaddr(m_axi_awaddr),
-     .m_axi_awprot(m_axi_awprot),
-     .m_axi_awvalid(m_axi_awvalid),
-     .m_axi_awready(m_axi_awready),
-     .m_axi_awlock(m_axi_awlock),
-     .m_axi_wdata(m_axi_wdata),
-     .m_axi_wstrb(m_axi_wstrb),
-     .m_axi_wlast(m_axi_wlast),
-     .m_axi_wvalid(m_axi_wvalid),
-     .m_axi_wready(m_axi_wready),
-     .m_axi_bid(m_axi_bid),
-     .m_axi_bresp(m_axi_bresp),
-     .m_axi_bvalid(m_axi_bvalid),
-     .m_axi_bready(m_axi_bready),
-     .m_axi_arid(m_axi_arid),
-     .m_axi_arlen(m_axi_arlen),
-     .m_axi_arsize(m_axi_arsize),
-     .m_axi_arburst(m_axi_arburst),
-     .m_axi_arprot(m_axi_arprot),
-     .m_axi_arcache(m_axi_arcache),
-     .m_axi_arvalid(m_axi_arvalid),
-     .m_axi_araddr(m_axi_araddr),
-     .m_axi_arlock(m_axi_arlock),
-     .m_axi_arready(m_axi_arready),
-     .m_axi_rid(m_axi_rid),
-     .m_axi_rdata(m_axi_rdata),
-     .m_axi_rresp(m_axi_rresp),
-     .m_axi_rvalid(m_axi_rvalid),
-     .m_axi_rlast(m_axi_rlast),
-     .m_axi_rready(m_axi_rready));
+     .m_axi_awid(m0_axi_awid),
+     .m_axi_awlen(m0_axi_awlen),
+     .m_axi_awsize(m0_axi_awsize),
+     .m_axi_awburst(m0_axi_awburst),
+     .m_axi_awcache(m0_axi_awcache),
+     .m_axi_awaddr(m0_axi_awaddr),
+     .m_axi_awprot(m0_axi_awprot),
+     .m_axi_awvalid(m0_axi_awvalid),
+     .m_axi_awready(m0_axi_awready),
+     .m_axi_awlock(m0_axi_awlock),
+     .m_axi_wdata(m0_axi_wdata),
+     .m_axi_wstrb(m0_axi_wstrb),
+     .m_axi_wlast(m0_axi_wlast),
+     .m_axi_wvalid(m0_axi_wvalid),
+     .m_axi_wready(m0_axi_wready),
+     .m_axi_bid(m0_axi_bid),
+     .m_axi_bresp(m0_axi_bresp),
+     .m_axi_bvalid(m0_axi_bvalid),
+     .m_axi_bready(m0_axi_bready),
+     .m_axi_arid(m0_axi_arid),
+     .m_axi_arlen(m0_axi_arlen),
+     .m_axi_arsize(m0_axi_arsize),
+     .m_axi_arburst(m0_axi_arburst),
+     .m_axi_arprot(m0_axi_arprot),
+     .m_axi_arcache(m0_axi_arcache),
+     .m_axi_arvalid(m0_axi_arvalid),
+     .m_axi_araddr(m0_axi_araddr),
+     .m_axi_arlock(m0_axi_arlock),
+     .m_axi_arready(m0_axi_arready),
+     .m_axi_rid(m0_axi_rid),
+     .m_axi_rdata(m0_axi_rdata),
+     .m_axi_rresp(m0_axi_rresp),
+     .m_axi_rvalid(m0_axi_rvalid),
+     .m_axi_rlast(m0_axi_rlast),
+     .m_axi_rready(m0_axi_rready));
 
-  // AXI Clock Converter
+  axi_crossbar axi_crossbar
+    (.aclk(CPUCLK),
+     // Connect managers
+     .aresetn(peripheral_aresetn),
+     .s_axi_awid(m0_axi_awid),
+     .s_axi_awlen(m0_axi_awlen),
+     .s_axi_awsize(m0_axi_awsize),
+     .s_axi_awburst(m0_axi_awburst),
+     .s_axi_awcache(m0_axi_awcache),
+     .s_axi_awaddr(m0_axi_awaddr),
+     .s_axi_awprot(m0_axi_awprot),
+     .s_axi_awvalid(m0_axi_awvalid),
+     .s_axi_awready(m0_axi_awready),
+
+     .s_axi_awlock(m0_axi_awlock),
+     .s_axi_awqos(4'b0),
+     .s_axi_wdata(m0_axi_wdata),
+     .s_axi_wstrb(m0_axi_wstrb),
+     .s_axi_wlast(m0_axi_wlast),
+     .s_axi_wvalid(m0_axi_wvalid),
+     .s_axi_wready(m0_axi_wready),
+
+     .s_axi_bid(m0_axi_bid),
+     .s_axi_bresp(m0_axi_bresp),
+     .s_axi_bvalid(m0_axi_bvalid),
+     .s_axi_bready(m0_axi_bready),
+     .s_axi_arid(m0_axi_arid),
+     .s_axi_arlen(m0_axi_arlen),
+     .s_axi_arsize(m0_axi_arsize),
+     .s_axi_arburst(m0_axi_arburst),
+     .s_axi_arprot(m0_axi_arprot),
+     .s_axi_arcache(m0_axi_arcache),
+     .s_axi_arvalid(m0_axi_arvalid),
+     .s_axi_araddr(m0_axi_araddr),
+     .s_axi_arlock(m0_axi_arlock),
+     .s_axi_arready(m0_axi_arready),
+     .s_axi_arqos(4'b0),
+
+     .s_axi_rid(m0_axi_rid),
+     .s_axi_rdata(m0_axi_rdata),
+     .s_axi_rresp(m0_axi_rresp),
+     .s_axi_rvalid(m0_axi_rvalid),
+     .s_axi_rlast(m0_axi_rlast),
+     .s_axi_rready(m0_axi_rready),
+
+     // Connect subordinates
+     .m_axi_awid({XBAR_m01_axi_awid, XBAR_m00_axi_awid}),
+     .m_axi_awlen({XBAR_m01_axi_awlen, XBAR_m00_axi_awlen}),
+     .m_axi_awsize({XBAR_m01_axi_awsize, XBAR_m00_axi_awsize}),
+     .m_axi_awburst({XBAR_m01_axi_awburst, XBAR_m00_axi_awburst}),
+     .m_axi_awcache({XBAR_m01_axi_awcache, XBAR_m00_axi_awcache}),
+     .m_axi_awaddr({XBAR_m01_axi_awaddr, XBAR_m00_axi_awaddr}),
+     .m_axi_awprot({XBAR_m01_axi_awprot, XBAR_m00_axi_awprot}),
+     .m_axi_awvalid({XBAR_m01_axi_awvalid, XBAR_m00_axi_awvalid}),
+     .m_axi_awready({XBAR_m01_axi_awready, XBAR_m00_axi_awready}),
+     .m_axi_awlock({XBAR_m01_axi_awlock, XBAR_m00_axi_awlock}),
+     .m_axi_awregion(),
+     .m_axi_awqos(),
+     .m_axi_wdata({XBAR_m01_axi_wdata, XBAR_m00_axi_wdata}),
+     .m_axi_wstrb({XBAR_m01_axi_wstrb, XBAR_m00_axi_wstrb}),
+     .m_axi_wlast({XBAR_m01_axi_wlast, XBAR_m00_axi_wlast}),
+     .m_axi_wvalid({XBAR_m01_axi_wvalid, XBAR_m00_axi_wvalid}),
+     .m_axi_wready({XBAR_m01_axi_wready, XBAR_m00_axi_wready}),
+     .m_axi_bid({XBAR_m01_axi_bid, XBAR_m00_axi_bid}),
+     .m_axi_bresp({XBAR_m01_axi_bresp, XBAR_m00_axi_bresp}),
+     .m_axi_bvalid({XBAR_m01_axi_bvalid, XBAR_m00_axi_bvalid}),
+     .m_axi_bready({XBAR_m01_axi_bready, XBAR_m00_axi_bready}),
+     .m_axi_arid({XBAR_m01_axi_arid, XBAR_m00_axi_arid}),
+     .m_axi_arlen({XBAR_m01_axi_arlen, XBAR_m00_axi_arlen}),
+     .m_axi_arsize({XBAR_m01_axi_arsize, XBAR_m00_axi_arsize}),
+     .m_axi_arburst({XBAR_m01_axi_arburst, XBAR_m00_axi_arburst}),
+     .m_axi_arprot({XBAR_m01_axi_arprot, XBAR_m00_axi_arprot}),
+     .m_axi_arcache({XBAR_m01_axi_arcache, XBAR_m00_axi_arcache}),
+     .m_axi_arvalid({XBAR_m01_axi_arvalid, XBAR_m00_axi_arvalid}),
+     .m_axi_araddr({XBAR_m01_axi_araddr, XBAR_m00_axi_araddr}),
+     .m_axi_arlock({XBAR_m01_axi_arlock, XBAR_m00_axi_arlock}),
+     .m_axi_arready({XBAR_m01_axi_arready, XBAR_m00_axi_arready}),
+     .m_axi_arregion(),
+     .m_axi_arqos(),
+     .m_axi_rid({XBAR_m01_axi_rid, XBAR_m00_axi_rid}),
+     .m_axi_rdata({XBAR_m01_axi_rdata, XBAR_m00_axi_rdata}),
+     .m_axi_rresp({XBAR_m01_axi_rresp, XBAR_m00_axi_rresp}),
+     .m_axi_rvalid({XBAR_m01_axi_rvalid, XBAR_m00_axi_rvalid}),
+     .m_axi_rlast({XBAR_m01_axi_rlast, XBAR_m00_axi_rlast}),
+     .m_axi_rready({XBAR_m01_axi_rready, XBAR_m00_axi_rready}));
+
+  axi_prtcl_conv ptrcl_conv (
+    .aclk(CPUCLK),
+    .aresetn(peripheral_aresetn),
+    .s_axi_awid(XBAR_m01_axi_awid),
+    .s_axi_awaddr(XBAR_m01_axi_awaddr),
+    .s_axi_awlen(XBAR_m01_axi_awlen),
+    .s_axi_awsize(XBAR_m01_axi_awsize),
+    .s_axi_awburst(XBAR_m01_axi_awburst),
+    .s_axi_awlock(XBAR_m01_axi_awlock),
+    .s_axi_awcache(XBAR_m01_axi_awcache),
+    .s_axi_awprot(XBAR_m01_axi_awprot),
+    .s_axi_awregion(4'b0),
+    .s_axi_awqos(4'b0),
+    .s_axi_awvalid(XBAR_m01_axi_awvalid),
+    .s_axi_awready(XBAR_m01_axi_awready),
+    .s_axi_wdata(XBAR_m01_axi_wdata),
+    .s_axi_wstrb(XBAR_m01_axi_wstrb),
+    .s_axi_wlast(XBAR_m01_axi_wlast),
+    .s_axi_wvalid(XBAR_m01_axi_wvalid),
+    .s_axi_wready(XBAR_m01_axi_wready),
+    .s_axi_bid(XBAR_m01_axi_bid),
+    .s_axi_bresp(XBAR_m01_axi_bresp),
+    .s_axi_bvalid(XBAR_m01_axi_bvalid),
+    .s_axi_bready(XBAR_m01_axi_bready),
+    .s_axi_arid(XBAR_m01_axi_arid),
+    .s_axi_araddr(XBAR_m01_axi_araddr),
+    .s_axi_arlen(XBAR_m01_axi_arlen),
+    .s_axi_arsize(XBAR_m01_axi_arsize),
+    .s_axi_arburst(XBAR_m01_axi_arburst),
+    .s_axi_arlock(XBAR_m01_axi_arlock),
+    .s_axi_arcache(XBAR_m01_axi_arcache),
+    .s_axi_arprot(XBAR_m01_axi_arprot),
+    .s_axi_arregion(4'b0),
+    .s_axi_arqos(4'b0),
+    .s_axi_arvalid(XBAR_m01_axi_arvalid),
+    .s_axi_arready(XBAR_m01_axi_arready),
+    .s_axi_rid(XBAR_m01_axi_rid),
+    .s_axi_rdata(XBAR_m01_axi_rdata),
+    .s_axi_rresp(XBAR_m01_axi_rresp),
+    .s_axi_rlast(XBAR_m01_axi_rlast),
+    .s_axi_rvalid(XBAR_m01_axi_rvalid),
+    .s_axi_rready(XBAR_m01_axi_rready),
+    .m_axi_awaddr(axil_awaddr),
+    .m_axi_awprot(axil_awprot),
+    .m_axi_awvalid(axil_awvalid),
+    .m_axi_awready(axil_awready),
+    .m_axi_wdata(axil_wdata),
+    .m_axi_wstrb(axil_wstrb),
+    .m_axi_wvalid(axil_wvalid),
+    .m_axi_wready(axil_wready),
+    .m_axi_bresp(axil_bresp),
+    .m_axi_bvalid(axil_bvalid),
+    .m_axi_bready(axil_bready),
+    .m_axi_araddr(axil_araddr),
+    .m_axi_arprot(axil_arprot),
+    .m_axi_arvalid(axil_arvalid),
+    .m_axi_arready(axil_arready),
+    .m_axi_rdata(axil_rdata),
+    .m_axi_rresp(axil_rresp),
+    .m_axi_rvalid(axil_rvalid),
+    .m_axi_rready(axil_rready));
+
+  axi_dwidth_conv_64to32 down_converter (
+    .s_axi_aclk(CPUCLK),
+    .s_axi_aresetn(peripheral_aresetn),
+    .s_axi_awaddr(axil_awaddr),
+    .s_axi_awprot(axil_awprot),
+    .s_axi_awvalid(axil_awvalid),
+    .s_axi_awready(axil_awready),
+    .s_axi_wdata(axil_wdata),
+    .s_axi_wstrb(axil_wstrb),
+    .s_axi_wvalid(axil_wvalid),
+    .s_axi_wready(axil_wready),
+    .s_axi_bresp(axil_bresp),
+    .s_axi_bvalid(axil_bvalid),
+    .s_axi_bready(axil_bready),
+    .s_axi_araddr(axil_araddr),
+    .s_axi_arprot(axil_arprot),
+    .s_axi_arvalid(axil_arvalid),
+    .s_axi_arready(axil_arready),
+    .s_axi_rdata(axil_rdata),
+    .s_axi_rresp(axil_rresp),
+    .s_axi_rvalid(axil_rvalid),
+    .s_axi_rready(axil_rready),
+    .m_axi_awaddr(axil_dwidth_awaddr),
+    .m_axi_awprot(axil_dwidth_awprot),
+    .m_axi_awvalid(axil_dwidth_awvalid),
+    .m_axi_awready(axil_dwidth_awready),
+    .m_axi_wdata(axil_dwidth_wdata),
+    .m_axi_wstrb(axil_dwidth_wstrb),
+    .m_axi_wvalid(axil_dwidth_wvalid),
+    .m_axi_wready(axil_dwidth_wready),
+    .m_axi_bresp(axil_dwidth_bresp),
+    .m_axi_bvalid(axil_dwidth_bvalid),
+    .m_axi_bready(axil_dwidth_bready),
+    .m_axi_araddr(axil_dwidth_araddr),
+    .m_axi_arprot(axil_dwidth_arprot),
+    .m_axi_arvalid(axil_dwidth_arvalid),
+    .m_axi_arready(axil_dwidth_arready),
+    .m_axi_rdata(axil_dwidth_rdata),
+    .m_axi_rresp(axil_dwidth_rresp),
+    .m_axi_rvalid(axil_dwidth_rvalid),
+    .m_axi_rready(axil_dwidth_rready)
+  );
+
+  axi_ethernet axi_ethernet (
+    .s_axi_aclk(CPUCLK),
+    .s_axi_aresetn(1'b1),
+    .ip2intc_irpt(ETHIntr),
+    .s_axi_awaddr(axil_dwidth_awaddr[12:0]),
+    .s_axi_awvalid(axil_dwidth_awvalid),
+    .s_axi_awready(axil_dwidth_awready),
+    .s_axi_wdata(axil_dwidth_wdata),
+    .s_axi_wstrb(axil_dwidth_wstrb),
+    .s_axi_wvalid(axil_dwidth_wvalid),
+    .s_axi_wready(axil_dwidth_wready),
+    .s_axi_bresp(axil_dwidth_bresp),
+    .s_axi_bvalid(axil_dwidth_bvalid),
+    .s_axi_bready(axil_dwidth_bready),
+    .s_axi_araddr(axil_dwidth_araddr[12:0]),
+    .s_axi_arvalid(axil_dwidth_arvalid),
+    .s_axi_arready(axil_dwidth_arready),
+    .s_axi_rdata(axil_dwidth_rdata),
+    .s_axi_rresp(axil_dwidth_rresp),
+    .s_axi_rvalid(axil_dwidth_rvalid),
+    .s_axi_rready(axil_dwidth_rready),
+    .phy_tx_clk(phy_tx_clk),
+    .phy_rx_clk(phy_rx_clk),
+    .phy_crs(phy_crs),
+    .phy_dv(phy_rx_dv),
+    .phy_rx_data(phy_rxd),
+    .phy_col(phy_col),
+    .phy_rx_er(phy_rx_er),
+    .phy_rst_n(phy_reset_n),
+    .phy_tx_en(phy_tx_en),
+    .phy_tx_data(phy_txd)
+  );
+
+  //  AXI Clock Converter
   clkconverter clkconverter
     (.s_axi_aclk(CPUCLK),
      .s_axi_aresetn(peripheral_aresetn),
-     .s_axi_awid(m_axi_awid),
-     .s_axi_awlen(m_axi_awlen),
-     .s_axi_awsize(m_axi_awsize),
-     .s_axi_awburst(m_axi_awburst),
-     .s_axi_awcache(m_axi_awcache),
-     .s_axi_awaddr(m_axi_awaddr[30:0] ),
-     .s_axi_awprot(m_axi_awprot),
+     .s_axi_awid(XBAR_m00_axi_awid),
+     .s_axi_awlen(XBAR_m00_axi_awlen),
+     .s_axi_awsize(XBAR_m00_axi_awsize),
+     .s_axi_awburst(XBAR_m00_axi_awburst),
+     .s_axi_awcache(XBAR_m00_axi_awcache),
+     .s_axi_awaddr(XBAR_m00_axi_awaddr[30:0] ),
+     .s_axi_awprot(XBAR_m00_axi_awprot),
      .s_axi_awregion(4'b0), // this could be a bug. bridge does not have these outputs
      .s_axi_awqos(4'b0),    // this could be a bug. bridge does not have these outputs
-     .s_axi_awvalid(m_axi_awvalid),
-     .s_axi_awready(m_axi_awready),
-     .s_axi_awlock(m_axi_awlock),
-     .s_axi_wdata(m_axi_wdata),
-     .s_axi_wstrb(m_axi_wstrb),
-     .s_axi_wlast(m_axi_wlast),
-     .s_axi_wvalid(m_axi_wvalid),
-     .s_axi_wready(m_axi_wready),
-     .s_axi_bid(m_axi_bid),
-     .s_axi_bresp(m_axi_bresp),
-     .s_axi_bvalid(m_axi_bvalid),
-     .s_axi_bready(m_axi_bready),
-     .s_axi_arid(m_axi_arid),
-     .s_axi_arlen(m_axi_arlen),
-     .s_axi_arsize(m_axi_arsize),
-     .s_axi_arburst(m_axi_arburst),
-     .s_axi_arprot(m_axi_arprot),
+     .s_axi_awvalid(XBAR_m00_axi_awvalid),
+     .s_axi_awready(XBAR_m00_axi_awready),
+     .s_axi_awlock(XBAR_m00_axi_awlock),
+     .s_axi_wdata(XBAR_m00_axi_wdata),
+     .s_axi_wstrb(XBAR_m00_axi_wstrb),
+     .s_axi_wlast(XBAR_m00_axi_wlast),
+     .s_axi_wvalid(XBAR_m00_axi_wvalid),
+     .s_axi_wready(XBAR_m00_axi_wready),
+     .s_axi_bid(XBAR_m00_axi_bid),
+     .s_axi_bresp(XBAR_m00_axi_bresp),
+     .s_axi_bvalid(XBAR_m00_axi_bvalid),
+     .s_axi_bready(XBAR_m00_axi_bready),
+     .s_axi_arid(XBAR_m00_axi_arid),
+     .s_axi_arlen(XBAR_m00_axi_arlen),
+     .s_axi_arsize(XBAR_m00_axi_arsize),
+     .s_axi_arburst(XBAR_m00_axi_arburst),
+     .s_axi_arprot(XBAR_m00_axi_arprot),
      .s_axi_arregion(4'b0), // this could be a bug. bridge does not have these outputs
      .s_axi_arqos(4'b0),    // this could be a bug. bridge does not have these outputs
-     .s_axi_arcache(m_axi_arcache),
-     .s_axi_arvalid(m_axi_arvalid),
-     .s_axi_araddr(m_axi_araddr[30:0]),
-     .s_axi_arlock(m_axi_arlock),
-     .s_axi_arready(m_axi_arready),
-     .s_axi_rid(m_axi_rid),
-     .s_axi_rdata(m_axi_rdata),
-     .s_axi_rresp(m_axi_rresp),
-     .s_axi_rvalid(m_axi_rvalid),
-     .s_axi_rlast(m_axi_rlast),
-     .s_axi_rready(m_axi_rready),
+     .s_axi_arcache(XBAR_m00_axi_arcache),
+     .s_axi_arvalid(XBAR_m00_axi_arvalid),
+     .s_axi_araddr(XBAR_m00_axi_araddr[30:0]),
+     .s_axi_arlock(XBAR_m00_axi_arlock),
+     .s_axi_arready(XBAR_m00_axi_arready),
+     .s_axi_rid(XBAR_m00_axi_rid),
+     .s_axi_rdata(XBAR_m00_axi_rdata),
+     .s_axi_rresp(XBAR_m00_axi_rresp),
+     .s_axi_rvalid(XBAR_m00_axi_rvalid),
+     .s_axi_rlast(XBAR_m00_axi_rlast),
+     .s_axi_rready(XBAR_m00_axi_rready),
 
      .m_axi_aclk(BUSCLK),
      .m_axi_aresetn(resetn),

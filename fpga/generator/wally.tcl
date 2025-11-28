@@ -38,6 +38,10 @@ if {$board=="ArtyA7"} {
 import_ip IP/sysrst.srcs/sources_1/ip/sysrst/sysrst.xci
 import_ip IP/ahbaxibridge.srcs/sources_1/ip/ahbaxibridge/ahbaxibridge.xci
 import_ip IP/clkconverter.srcs/sources_1/ip/clkconverter/clkconverter.xci
+import_ip IP/axi_prtcl_conv.srcs/sources_1/ip/axi_prtcl_conv/axi_prtcl_conv.xci
+import_ip IP/axi_dwidth_conv_64to32.srcs/sources_1/ip/axi_dwidth_conv_64to32/axi_dwidth_conv_64to32.xci
+import_ip IP/axi_crossbar.srcs/sources_1/ip/axi_crossbar/axi_crossbar.xci
+import_ip IP/axi_ethernet.srcs/sources_1/ip/axi_ethernet/axi_ethernet.xci
 
 if {$board=="ArtyA7" || $board=="genesys2"} {
     import_ip IP/ddr3.srcs/sources_1/ip/ddr3/ddr3.xci
