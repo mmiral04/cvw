@@ -172,7 +172,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
   logic [3:0]      m1_axi_arcache;
   logic            m1_axi_arvalid;
   logic            m1_axi_arready;
-  logic [64:0]     m1_axi_rdata;
+  logic [63:0]     m1_axi_rdata;
   logic [1:0]      m1_axi_rresp;
   logic            m1_axi_rlast;
   logic            m1_axi_rvalid;
@@ -445,7 +445,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
      .m_axi_rready(m0_axi_rready));
 
 
-  eth_mac_mii_fifo #(.TARGET("XILINX"), .CLOCK_INPUT_STYLE("BUFG"), .AXIS_DATA_WIDTH(32), .TX_FIFO_DEPTH(1024))
+/*   eth_mac_mii_fifo #(.TARGET("XILINX"), .CLOCK_INPUT_STYLE("BUFG"), .AXIS_DATA_WIDTH(32), .TX_FIFO_DEPTH(1024))
   ethernet
     (.rst(peripheral_reset),
      .logic_clk(CPUCLK),
@@ -489,73 +489,81 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
      .rx_fifo_good_frame,
      .cfg_ifg(8'd12),
      .cfg_tx_enable(1'b1),
-     .cfg_rx_enable(1'b1));
+     .cfg_rx_enable(1'b1)); */
 
+  axis_traffic_gen axis_traffic_gen
+    (.ACLK(CPUCLK),
+     .ARESETn(peripheral_aresetn),
+     .tdata(eth_axis_tdata),
+     .tkeep(eth_axis_tkeep),
+     .tvalid(eth_axis_tvalid),
+     .tready(eth_axis_tready),
+     .tlast(eth_axis_tlast));
 
   xlnx_axi_dma axi_dma
     (
      // CLOCK
      .s_axi_lite_aclk(CPUCLK),
-     .m_axi_mm2s_aclk(CPUCLK),
+     //.m_axi_mm2s_aclk(CPUCLK),
      .m_axi_s2mm_aclk(CPUCLK),
      .axi_resetn(peripheral_aresetn),
 
      // AXI4-Lite control stream
-    //  .s_axi_lite_awvalid(s_axi_lite_awvalid),
-    //  .s_axi_lite_awready(s_axi_lite_awready),
-    //  .s_axi_lite_awaddr(s_axi_lite_awaddr),
-    //  .s_axi_lite_wvalid(s_axi_lite_wvalid),
-    //  .s_axi_lite_wready(s_axi_lite_wready),
-    //  .s_axi_lite_wdata(s_axi_lite_wdata),
-    //  .s_axi_lite_bresp(s_axi_lite_bresp),
-    //  .s_axi_lite_bvalid(s_axi_lite_bvalid),
-    //  .s_axi_lite_bready(s_axi_lite_bready),
-    //  .s_axi_lite_arvalid(s_axi_lite_arvalid),
-    //  .s_axi_lite_arready(s_axi_lite_arready),
-    //  .s_axi_lite_araddr(s_axi_lite_araddr),
-    //  .s_axi_lite_rvalid(s_axi_lite_rvalid),
-    //  .s_axi_lite_rready(s_axi_lite_rready),
-    //  .s_axi_lite_rdata(s_axi_lite_rdata),
-    //  .s_axi_lite_rresp(s_axi_lite_rresp),
+     .s_axi_lite_awvalid(XBAR_m01_axi_wvalid),
+     .s_axi_lite_awready(XBAR_m01_axi_awready),
+     .s_axi_lite_awaddr(XBAR_m01_axi_awaddr),
+     .s_axi_lite_wvalid(XBAR_m01_axi_wvalid),
+     .s_axi_lite_wready(XBAR_m01_axi_wready),
+     .s_axi_lite_wdata(XBAR_m01_axi_wdata),
+     .s_axi_lite_bresp(XBAR_m01_axi_bresp),
+     .s_axi_lite_bvalid(XBAR_m01_axi_bvalid),
+     .s_axi_lite_bready(XBAR_m01_axi_bready),
+     .s_axi_lite_arvalid(XBAR_m01_axi_arvalid),
+     .s_axi_lite_arready(XBAR_m01_axi_arready),
+     .s_axi_lite_araddr(XBAR_m01_axi_araddr),
+     .s_axi_lite_rvalid(XBAR_m01_axi_rvalid),
+     .s_axi_lite_rready(XBAR_m01_axi_rready),
+     .s_axi_lite_rdata(XBAR_m01_axi_rdata),
+     .s_axi_lite_rresp(XBAR_m01_axi_rresp),
 
-     .s_axi_lite_awvalid(1'b0),
-     .s_axi_lite_awready(),
-     .s_axi_lite_awaddr(10'b0),
-     .s_axi_lite_wvalid(1'b0),
-     .s_axi_lite_wready(),
-     .s_axi_lite_wdata(32'b0),
-     .s_axi_lite_bresp(),
-     .s_axi_lite_bvalid(),
-     .s_axi_lite_bready(1'b0),
-     .s_axi_lite_arvalid(1'b0),
-     .s_axi_lite_arready(),
-     .s_axi_lite_araddr(10'b0),
-     .s_axi_lite_rvalid(),
-     .s_axi_lite_rready(1'b0),
-     .s_axi_lite_rdata(32'b0),
-     .s_axi_lite_rresp(),
+    //  .s_axi_lite_awvalid(1'b0),
+    //  .s_axi_lite_awready(),
+    //  .s_axi_lite_awaddr(10'b0),
+    //  .s_axi_lite_wvalid(1'b0),
+    //  .s_axi_lite_wready(),
+    //  .s_axi_lite_wdata(32'b0),
+    //  .s_axi_lite_bresp(),
+    //  .s_axi_lite_bvalid(),
+    //  .s_axi_lite_bready(1'b0),
+    //  .s_axi_lite_arvalid(1'b0),
+    //  .s_axi_lite_arready(),
+    //  .s_axi_lite_araddr(10'b0),
+    //  .s_axi_lite_rvalid(),
+    //  .s_axi_lite_rready(1'b0),
+    //  .s_axi_lite_rdata(32'b0),
+    //  .s_axi_lite_rresp(),
 
      // MM2S AXI4 read channel
-     .m_axi_mm2s_araddr(m1_axi_araddr),
-     .m_axi_mm2s_arlen(m1_axi_arlen),
-     .m_axi_mm2s_arsize(m1_axi_arsize),
-     .m_axi_mm2s_arburst(m1_axi_arburst),
-     .m_axi_mm2s_arprot(m1_axi_arprot),
-     .m_axi_mm2s_arcache(m1_axi_arcache),
-     .m_axi_mm2s_arvalid(m1_axi_arvalid),
-     .m_axi_mm2s_arready(m1_axi_arready),
-     .m_axi_mm2s_rdata(m1_axi_rdata),
-     .m_axi_mm2s_rresp(m1_axi_rresp),
-     .m_axi_mm2s_rlast(m1_axi_rlast),
-     .m_axi_mm2s_rvalid(m1_axi_rvalid),
-     .m_axi_mm2s_rready(m1_axi_rready),
+    //  .m_axi_mm2s_araddr(m1_axi_araddr),
+    //  .m_axi_mm2s_arlen(m1_axi_arlen),
+    //  .m_axi_mm2s_arsize(m1_axi_arsize),
+    //  .m_axi_mm2s_arburst(m1_axi_arburst),
+    //  .m_axi_mm2s_arprot(m1_axi_arprot),
+    //  .m_axi_mm2s_arcache(m1_axi_arcache),
+    //  .m_axi_mm2s_arvalid(m1_axi_arvalid),
+    //  .m_axi_mm2s_arready(m1_axi_arready),
+    //  .m_axi_mm2s_rdata(m1_axi_rdata),
+    //  .m_axi_mm2s_rresp(m1_axi_rresp),
+    //  .m_axi_mm2s_rlast(m1_axi_rlast),
+    //  .m_axi_mm2s_rvalid(m1_axi_rvalid),
+    //  .m_axi_mm2s_rready(m1_axi_rready),
 
      // MM2S AXI-Stream read channel
-     .m_axis_mm2s_tdata(dma_axis_tdata),
-     .m_axis_mm2s_tkeep(dma_axis_tkeep),
-     .m_axis_mm2s_tvalid(dma_axis_tvalid),
-     .m_axis_mm2s_tready(dma_axis_tready),
-     .m_axis_mm2s_tlast(dma_axis_tlast),
+    //  .m_axis_mm2s_tdata(dma_axis_tdata),
+    //  .m_axis_mm2s_tkeep(dma_axis_tkeep),
+    //  .m_axis_mm2s_tvalid(dma_axis_tvalid),
+    //  .m_axis_mm2s_tready(dma_axis_tready),
+    //  .m_axis_mm2s_tlast(dma_axis_tlast),
 
      // S2MM AXI4 write channel
      .m_axi_s2mm_awaddr(m1_axi_awaddr),
@@ -582,9 +590,9 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
      .s_axis_s2mm_tready(eth_axis_tready),
      .s_axis_s2mm_tlast(eth_axis_tlast),
 
-     .mm2s_prmry_reset_out_n(dma_mm2s_prmry_reset_out_n),
+     //.mm2s_prmry_reset_out_n(dma_mm2s_prmry_reset_out_n),
      .s2mm_prmry_reset_out_n(dma_s2mm_prmry_reset_out_n),
-     .mm2s_introut(dma_mm2s_introut),
+     //.mm2s_introut(dma_mm2s_introut),
      .s2mm_introut(dma_s2mm_introut),
      .axi_dma_tstvec(axi_dma_tstvec));
 
@@ -613,22 +621,22 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
      .s_axi_bvalid({m1_axi_bvalid, m0_axi_bvalid}),
      .s_axi_bready({m1_axi_bready, m0_axi_bready}),
      .s_axi_arid({4'b0, m0_axi_arid}),
-     .s_axi_arlen({m1_axi_arlen, m0_axi_arlen}),
-     .s_axi_arsize({m1_axi_arsize, m0_axi_arsize}),
-     .s_axi_arburst({m1_axi_arburst, m0_axi_arburst}),
-     .s_axi_arprot({m1_axi_arprot, m0_axi_arprot}),
-     .s_axi_arcache({m1_axi_arcache, m0_axi_arcache}),
-     .s_axi_arvalid({m1_axi_arvalid, m0_axi_arvalid}),
-     .s_axi_araddr({m1_axi_araddr, m0_axi_araddr}),
+     .s_axi_arlen({8'b0, m0_axi_arlen}),
+     .s_axi_arsize({3'b0, m0_axi_arsize}),
+     .s_axi_arburst({2'b0, m0_axi_arburst}),
+     .s_axi_arprot({3'b0, m0_axi_arprot}),
+     .s_axi_arcache({4'b0, m0_axi_arcache}),
+     .s_axi_arvalid({1'b0, m0_axi_arvalid}),
+     .s_axi_araddr({32'b0, m0_axi_araddr}),
      .s_axi_arlock({1'b0, m0_axi_arlock}),
-     .s_axi_arready({m1_axi_arready, m0_axi_arready}),
+     .s_axi_arready({1'b0, m0_axi_arready}),
      .s_axi_arqos(8'b0),
      .s_axi_rid({4'b0, m0_axi_rid}),
-     .s_axi_rdata({m1_axi_rdata, m0_axi_rdata}),
-     .s_axi_rresp({m1_axi_rresp, m0_axi_rresp}),
-     .s_axi_rvalid({m1_axi_rvalid, m0_axi_rvalid}),
-     .s_axi_rlast({m1_axi_rlast, m0_axi_rlast}),
-     .s_axi_rready({m1_axi_rready, m0_axi_rready}),
+     .s_axi_rdata({64'b0, m0_axi_rdata}),
+     .s_axi_rresp({2'b0, m0_axi_rresp}),
+     .s_axi_rvalid({1'b0, m0_axi_rvalid}),
+     .s_axi_rlast({1'b0, m0_axi_rlast}),
+     .s_axi_rready({1'b0, m0_axi_rready}),
 
      // Connect subordinates
      .m_axi_awid({XBAR_m01_axi_awid, XBAR_m00_axi_awid}),
