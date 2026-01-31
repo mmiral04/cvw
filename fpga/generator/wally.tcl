@@ -51,6 +51,8 @@ if {$board=="ArtyA7" || $board=="genesys2"} {
 # read in all other rtl
 add_files [glob -type f  ../src/CopiedFiles_do_not_add_to_repo/*/*.sv ../src/CopiedFiles_do_not_add_to_repo/*/*/*.sv]
 
+add_files ../src/simple_peripheral.sv
+
 set_property include_dirs {../src/CopiedFiles_do_not_add_to_repo/config ../../config/shared} [current_fileset]
 
 
