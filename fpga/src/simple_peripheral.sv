@@ -147,9 +147,9 @@ module simple_peripheral (
     endfunction
 
     // led output logic
-    assign led1_state = led1_register == 0;
-    assign led2_state = led2_register == 0;
-    assign led3_state = led3_register == 0;
-    assign led4_state = led4_register == 0;
+    assign led1_state = led1_register != 0;
+    assign led2_state = led2_register != 0;
+    assign led3_state = led3_register != 0;
+    assign led4_state = led4_register != 0;
 
 endmodule

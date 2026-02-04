@@ -186,6 +186,9 @@ localparam logic [63:0] SDC_RANGE        = 64'h00000FFF;
 localparam logic SPI_SUPPORTED = 1;
 localparam logic [63:0] SPI_BASE         = 64'h10040000;
 localparam logic [63:0] SPI_RANGE        = 64'h00000FFF;
+localparam logic ETH_SUPPORTED = 0;
+localparam logic [63:0] ETH_BASE         = 64'h00001000;
+localparam logic [63:0] ETH_RANGE        = 64'h0000001F;
 
 // Bus Interface width
 localparam AHBW = (XLEN);

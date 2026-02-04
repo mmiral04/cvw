@@ -58,6 +58,9 @@ EXT_MEM_RANGE       64'h7FFFFFFF
 SDC_SUPPORTED       1
 PLIC_SDC_ID         32'd20
 BPRED_SIZE          32'd12
+ETH_SUPPORTED       1
+ETH_BASE            64'h00001000
+ETH_RANGE           64'h0000001F
 
 deriv fpgaArtyA7 fpga
 EXT_MEM_RANGE       64'h0FFFFFFF
