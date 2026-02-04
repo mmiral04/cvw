@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
 ##################################
 #
 # regression-wally
@@ -55,7 +55,7 @@ standard_tests = [
                     "arch64d_divsqrt", "arch64zfh_divsqrt", "arch64zfaf", "arch64zfad", "coverage64gc", "arch64i", "arch64priv",
                     "arch64c",  "arch64m", "arch64zcb", "arch64zifencei", "arch64zicond", "arch64a_amo", "wally64a_lrsc",
                     "wally64periph", "wally64priv", "arch64zbkb", "arch64zbkc", "arch64zbkx", "arch64zknd", "arch64zkne", "arch64zknh",
-                    "arch64zba",  "arch64zbb",  "arch64zbc", "arch64zbs", "arch64vm_sv39", "arch64vm_sv48", "arch64pmp", "arch64zicboz"]]
+                    "arch64zba",  "arch64zbb",  "arch64zbc", "arch64zbs", "arch64vm_sv39", "arch64vm_sv48", "arch64vm_sv57", "arch64pmp", "arch64zicboz"]]
     ]
 
 # Separate test for short buildroot run through OpenSBI UART output
@@ -143,6 +143,11 @@ derivconfigtests = [
                         "arch32zba", "arch32zfaf", "arch32zfad", "wally32a_lrsc", "arch32zcb", "arch32zbkx", "arch32zknd"]],
         ["noU_rv64gc", ["arch64i", "arch64f", "arch64priv", "arch64c", "arch64m", "arch64a_amo", "arch64zifencei", "arch64zicond",
                         "arch64zba", "arch64zfaf", "arch64zfad", "wally64a_lrsc", "arch64zcb", "arch64zbkx", "arch64zknd"]],
+
+        # VM variants
+        ["sv39", ["arch64vm_sv39"]],
+        ["sv48", ["arch64vm_sv48", "arch64vm_sv39"]],
+        ### add other VM derivatives for sv39_nosvadu, sv39_nosvnapot, sv39_nosvpbmt, sv32_nosvadu
 
         ### add misaligned tests
 
@@ -493,8 +498,8 @@ def selectTests(args, sims, coverStr):
         addTestsByDir(f"{WALLY}/tests/coverage/", "rv64gc", coveragesim, coverStr, configs, lockstepMode=1)
     # run tests in lockstep in functional coverage mode
     if args.fcov or args.nightly:
-        addTestsByDir(f"{archVerifDir}/work/cvw-rv32gc/elfs/rv32/I", "rv32gc", coveragesim, coverStr, configs, lockstepMode=1)
-        addTestsByDir(f"{archVerifDir}/work/cvw-rv64gc/elfs/rv64/I", "rv64gc", coveragesim, coverStr, configs, lockstepMode=1)
+        addTestsByDir(f"{archVerifDir}/work/cvw-rv32gc/elfs/rv32i/I", "rv32gc", coveragesim, coverStr, configs, lockstepMode=1)
+        addTestsByDir(f"{archVerifDir}/work/cvw-rv64gc/elfs/rv64i/I", "rv64gc", coveragesim, coverStr, configs, lockstepMode=1)
         # Extra tests from riscv-arch-test that should be run as part of the functional coverage suite
         # addTestsByDir(f"{WALLY}/tests/riscof/work/riscv-arch-test/rv32i_m/vm_sv32", "rv32gc", coveragesim, coverStr, configs, lockstepMode=1)
         # addTestsByDir(f"{WALLY}/tests/riscof/work/riscv-arch-test/rv64i_m/vm_sv39", "rv64gc", coveragesim, coverStr, configs, lockstepMode=1)
