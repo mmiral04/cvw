@@ -444,10 +444,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
      .S_AXI_RREADY(XBAR_m01_axi_rready),
      .S_AXI_RDATA(XBAR_m01_axi_rdata),
      .S_AXI_RRESP(XBAR_m01_axi_rresp),
-     .led1_state(led4_state),
-     .led2_state(led2_state),
-     .led3_state(led3_state),
-     .led4_state(led1_state));
+     .led1_state(led4_state));
 
 
   axi_crossbar axi_crossbar
