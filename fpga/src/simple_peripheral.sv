@@ -26,10 +26,16 @@ module simple_peripheral (
     output logic [1:0]  S_AXI_RRESP,
 
     // led signals
-    output logic        led1_state);
+    output logic        led1_state,
+    output logic        led2_state,
+    output logic        led3_state,
+    output logic        led4_state);
 
-    // BASE_ADDR = 0x00001000
+    // BASE_ADDR = 0x00100000
     logic [63:0] led1_register; // BASE_ADDR
+    logic [63:0] led2_register; // BASE_ADDR + 8
+    logic [63:0] led3_register; // BASE_ADDR + 16
+    logic [63:0] led4_register; // BASE_ADDR + 24
 
     logic        awready;
     logic        arready;
@@ -84,22 +90,40 @@ module simple_peripheral (
         if (!peripheral_aresetn) rdata = 64'b0;
         else if (!S_AXI_RVALID || S_AXI_RREADY)
             case (araddr)
-                32'h00001000: rdata = led1_register;
+                32'h00100000: rdata = led1_register;
+                32'h00100008: rdata = led2_register;
+                32'h00100010: rdata = led3_register;
+                32'h00100018: rdata = led4_register;
                 default:      rdata = rdata;
             endcase
     end
 
     logic [63:0] wstrb_led1;
+    logic [63:0] wstrb_led2;
+    logic [63:0] wstrb_led3;
+    logic [63:0] wstrb_led4;
     assign wstrb_led1 = apply_wstrb(led1_register, S_AXI_WDATA, S_AXI_WSTRB);
+    assign wstrb_led2 = apply_wstrb(led2_register, S_AXI_WDATA, S_AXI_WSTRB);
+    assign wstrb_led3 = apply_wstrb(led3_register, S_AXI_WDATA, S_AXI_WSTRB);
+    assign wstrb_led4 = apply_wstrb(led4_register, S_AXI_WDATA, S_AXI_WSTRB);
 
     always_ff @(posedge clk) begin : wdata_ff
         if (!peripheral_aresetn) begin
             led1_register = 64'b0;
+            led2_register = 64'b0;
+            led3_register = 64'b0;
+            led4_register = 64'b0;
         end else if (awready) begin
             case(awaddr)
-                32'h00001000: led1_register = wstrb_led1;
+                32'h00000000: led1_register = wstrb_led1;
+                32'h00000008: led2_register = wstrb_led2;
+                32'h00000010: led3_register = wstrb_led3;
+                32'h00000018: led4_register = wstrb_led4;
                 default: begin
                     led1_register = led1_register;
+                    led2_register = led2_register;
+                    led3_register = led3_register;
+                    led4_register = led4_register;
                 end
             endcase
         end
@@ -119,5 +143,8 @@ module simple_peripheral (
 
     // led output logic
     assign led1_state = led1_register != 0;
+    assign led2_state = led2_register != 0;
+    assign led3_state = led3_register != 0;
+    assign led4_state = led4_register != 0;
 
 endmodule

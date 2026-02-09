@@ -20,7 +20,9 @@ set_property -dict [list CONFIG.NUM_SI {2} \
                         CONFIG.DATA_WIDTH {64} \
                         CONFIG.ID_WIDTH {4} \
                         CONFIG.M00_A00_BASE_ADDR {0x0000000080000000} \
-                        CONFIG.M00_A00_ADDR_WIDTH {31}] [get_ips $ipName]
+                        CONFIG.M00_A00_ADDR_WIDTH {31} \
+                        CONFIG.M01_A00_BASE_ADDR {0x0000000000010000} \
+                        CONFIG.M01_A00_ADDR_WIDTH {12}] [get_ips $ipName]
 
 generate_target {instantiation_template} [get_files ./$ipName.srcs/sources_1/ip/$ipName/$ipName.xci]
 generate_target all [get_files  ./$ipName.srcs/sources_1/ip/$ipName/$ipName.xci]
