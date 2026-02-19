@@ -9,19 +9,15 @@ set boardName $::env(XILINX_BOARD)
 #set partNumber  xcku040-ffva1156-2-e
 #set boardName  xilinx.com:kcu105:part0:1.7
 
-set ipName axi_crossbar
+set ipName axi_prtcl_conv
 
 create_project $ipName . -force -part $partNumber
 set_property board_part $boardName [current_project]
 
-create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name $ipName
+create_ip -name axi_protocol_converter -vendor xilinx.com -library ip -version 2.1 -module_name $ipName
 
-set_property -dict [list CONFIG.NUM_SI {2} \
-                        CONFIG.DATA_WIDTH {64} \
-                        CONFIG.ID_WIDTH {4} \
-                        CONFIG.M00_A00_BASE_ADDR {0x0000000080000000} \
-                        CONFIG.M00_A00_ADDR_WIDTH {31} \
-                        CONFIG.M01_A00_BASE_ADDR {0x00000000000100000}] [get_ips $ipName]
+set_property -dict [list CONFIG.DATA_WIDTH {64} \
+                         CONFIG.ID_WIDTH {4}] [get_ips $ipName]
 
 generate_target {instantiation_template} [get_files ./$ipName.srcs/sources_1/ip/$ipName/$ipName.xci]
 generate_target all [get_files  ./$ipName.srcs/sources_1/ip/$ipName/$ipName.xci]

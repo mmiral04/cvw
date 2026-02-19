@@ -38,6 +38,7 @@ if {$board=="ArtyA7"} {
 import_ip IP/sysrst.srcs/sources_1/ip/sysrst/sysrst.xci
 import_ip IP/ahbaxibridge.srcs/sources_1/ip/ahbaxibridge/ahbaxibridge.xci
 import_ip IP/clkconverter.srcs/sources_1/ip/clkconverter/clkconverter.xci
+import_ip IP/axi_prtcl_conv.srcs/sources_1/ip/axi_prtcl_conv/axi_prtcl_conv.xci
 import_ip IP/axi_crossbar.srcs/sources_1/ip/axi_crossbar/axi_crossbar.xci
 import_ip IP/xlnx_axi_dma.srcs/sources_1/ip/xlnx_axi_dma/xlnx_axi_dma.xci
 
