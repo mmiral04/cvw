@@ -10,6 +10,12 @@ create_generated_clock -name SPISDCClock -source [get_pins mmcm/clk_out3] -multi
 set_property PACKAGE_PIN E3 [get_ports default_100mhz_clk]
 set_property IOSTANDARD LVCMOS33 [get_ports default_100mhz_clk]
 
+## LEDs
+set_property -dict { PACKAGE_PIN H5    IOSTANDARD LVCMOS33 } [get_ports { led1 }];
+set_property -dict { PACKAGE_PIN J5    IOSTANDARD LVCMOS33 } [get_ports { led2 }];
+set_property -dict { PACKAGE_PIN T9    IOSTANDARD LVCMOS33 } [get_ports { led3 }];
+set_property -dict { PACKAGE_PIN T10   IOSTANDARD LVCMOS33 } [get_ports { led4 }];
+
 ##### RVVI Ethernet ####
 # taken from https://github.com/alexforencich/verilog-ethernet/blob/master/example/Arty/fpga/fpga.xdc
 set_property -dict {LOC F15 IOSTANDARD LVCMOS33} [get_ports phy_rx_clk]
