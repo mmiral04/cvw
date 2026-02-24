@@ -533,10 +533,6 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
      .led3_state(led3_state),
      .led4_state(led1_state));
 
-  always_ff@(posedge CPUCLK)
-    if (!peripheral_aresetn) led5 <= 'b0;
-    else if (axil_awvalid) led5 <= ~led5;
-
 
   axi_crossbar axi_crossbar
     (.aclk(CPUCLK),

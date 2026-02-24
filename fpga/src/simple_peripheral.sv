@@ -115,7 +115,7 @@ module simple_peripheral (
             led4_register = 64'b0;
         end else if (awready) begin
             case(awaddr)
-                32'h00100000: led1_register = 'b1;
+                32'h00100000: led1_register = wstrb_led1;
                 32'h00100008: led2_register = wstrb_led2;
                 32'h00100010: led3_register = wstrb_led3;
                 32'h00100018: led4_register = wstrb_led4;
