@@ -18,10 +18,6 @@
     reg = <0x00 0x80000000 0x00 0x10000000>;
   };
 
-  peripheral@100000 {
-    reg = <0x00 0x100000 0x00 0x20>;
-  };
-
   cpus {
     #address-cells = <0x01>;
     #size-cells = <0x00>;
@@ -54,6 +50,10 @@
     #size-cells = <0x02>;
     compatible = "simple-bus";
     ranges;
+
+    eth: ethernet@100000 {
+      reg = <0x00 0x100000 0x00 0x4000>;
+    };
 
     refclk: refclk {
       #clock-cells = <0>;

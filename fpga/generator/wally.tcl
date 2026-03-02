@@ -41,6 +41,7 @@ import_ip IP/clkconverter.srcs/sources_1/ip/clkconverter/clkconverter.xci
 import_ip IP/axi_prtcl_conv.srcs/sources_1/ip/axi_prtcl_conv/axi_prtcl_conv.xci
 import_ip IP/axi_crossbar.srcs/sources_1/ip/axi_crossbar/axi_crossbar.xci
 import_ip IP/xlnx_axi_dma.srcs/sources_1/ip/xlnx_axi_dma/xlnx_axi_dma.xci
+import_ip IP/axi_ethernet.srcs/sources_1/ip/axi_ethernet/axi_ethernet.xci
 
 if {$board=="ArtyA7" || $board=="genesys2"} {
     import_ip IP/ddr3.srcs/sources_1/ip/ddr3/ddr3.xci
@@ -86,7 +87,7 @@ set_param messaging.defaultLimit 100000
 
 # this does synthesis?
 
-launch_runs synth_1 -jobs 16
+launch_runs synth_1 -jobs 24
 
 wait_on_run synth_1
 open_run synth_1
@@ -120,7 +121,7 @@ if {$board=="ArtyA7"} {
 #set_property "steps.place_design.args.directive" "RuntimeOptimized" [get_runs impl_1]
 #set_property "steps.route_design.args.directive" "RuntimeOptimized" [get_runs impl_1]
 
-launch_runs impl_1 -jobs 16
+launch_runs impl_1 -jobs 24
 wait_on_run impl_1
 launch_runs impl_1 -to_step write_bitstream
 wait_on_run impl_1

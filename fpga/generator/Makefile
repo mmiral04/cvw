@@ -54,6 +54,7 @@ IP_VCU: $(dst)/sysrst.log \
 	$(dst)/clkconverter.log \
 	$(dst)/ahbaxibridge.log
 IP_Arty: $(dst)/axi_prtcl_conv.log \
+	$(dst)/axi_ethernet.log \
 	$(dst)/axi_crossbar.log \
     $(dst)/xlnx_axi_dma.log \
     $(dst)/sysrst.log \
