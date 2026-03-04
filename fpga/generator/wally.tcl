@@ -38,6 +38,8 @@ if {$board=="ArtyA7"} {
 import_ip IP/sysrst.srcs/sources_1/ip/sysrst/sysrst.xci
 import_ip IP/ahbaxibridge.srcs/sources_1/ip/ahbaxibridge/ahbaxibridge.xci
 import_ip IP/clkconverter.srcs/sources_1/ip/clkconverter/clkconverter.xci
+import_ip IP/axi_prtcl_conv.srcs/sources_1/ip/axi_prtcl_conv/axi_prtcl_conv.xci
+import_ip IP/axi_crossbar.srcs/sources_1/ip/axi_crossbar/axi_crossbar.xci
 
 if {$board=="ArtyA7" || $board=="genesys2"} {
     import_ip IP/ddr3.srcs/sources_1/ip/ddr3/ddr3.xci
@@ -48,7 +50,7 @@ if {$board=="ArtyA7" || $board=="genesys2"} {
 
 # read in all other rtl
 add_files [glob -type f  ../src/CopiedFiles_do_not_add_to_repo/*/*.sv ../src/CopiedFiles_do_not_add_to_repo/*/*/*.sv]
-
+add_files ../src/simple_peripheral.sv
 set_property include_dirs {../src/CopiedFiles_do_not_add_to_repo/config ../../config/shared} [current_fileset]
 
 

@@ -53,7 +53,9 @@ IP_VCU: $(dst)/sysrst.log \
 	MEM_VCU \
 	$(dst)/clkconverter.log \
 	$(dst)/ahbaxibridge.log
-IP_Arty: $(dst)/sysrst.log \
+IP_Arty: $(dst)/axi_crossbar.log \
+	$(dst)/axi_prtcl_conv.log \
+	$(dst)/sysrst.log \
 	MEM_Arty \
 	$(dst)/mmcm.log \
 	$(dst)/clkconverter.log \
