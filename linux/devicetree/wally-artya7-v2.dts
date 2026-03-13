@@ -52,7 +52,7 @@
     ranges;
 
     eth: ethernet@100000 {
-      reg = <0x00 0x100000 0x00 0x4000>;
+      reg = <0x00 0x100000 0x00 0x40000>;
     };
 
     refclk: refclk {

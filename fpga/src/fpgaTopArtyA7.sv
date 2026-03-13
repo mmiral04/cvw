@@ -39,6 +39,8 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
 
    output logic        led4,
    output logic        led5,
+   output logic        led6,
+   output logic        led7,
 
    // UART Signals
    input logic         UARTSin,
@@ -65,6 +67,8 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
     input logic        phy_col, // nc
     input logic        phy_crs, // nc
     output logic       phy_reset_n,
+    output logic       phy_mdc,
+    inout logic        phy_mdio,
 
    inout logic [15:0]    ddr3_dq,
    inout logic [1:0]     ddr3_dqs_n,
@@ -83,10 +87,13 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
    output logic [0:0]    ddr3_odt
    );
 
-  logic led1_state;
-  logic led2_state;
-  logic led3_state;
-  logic led4_state;
+  logic [3:0] phy_rxd_2;
+  assign phy_rxd = phy_rxd_2;
+  assign led5 = phy_crs;
+  assign led6 = phy_rx_dv;
+  assign led7 = phy_rx_er;
+  logic ip2intc_irpt;
+  assign led4 = ip2intc_irpt;
 
   // MMCM Signals
   logic          CPUCLK;
@@ -117,6 +124,9 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
 
   // GPIO Signals
   logic [31:0]    GPIOIN, GPIOOUT, GPIOEN;
+
+  // Ethernet Signals
+  logic            phy_mdio_i, phy_mdio_o, phy_mdio_t;
 
   // AHB to AXI Bridge Signals
   logic [3:0]      m0_axi_awid;
@@ -177,8 +187,6 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
   logic            dma_axis_tvalid;
   logic            dma_axis_tready;
   logic            dma_axis_tlast;
-
-
 
   // AXI crossbar output signals
   logic aresetn_out;
@@ -256,7 +264,44 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
   logic            XBAR_m01_axi_rlast;
   logic            XBAR_m01_axi_rready;
 
-  // AXI signals going out of Protocol Converter
+  // AXI Signals going out of dwidth converter
+  logic [3:0]      axil_dwidth_awid;
+  logic [7:0]      axil_dwidth_awlen;
+  logic [2:0]      axil_dwidth_awsize;
+  logic [1:0]      axil_dwidth_awburst;
+  logic [3:0]      axil_dwidth_awcache;
+  logic [31:0]     axil_dwidth_awaddr;
+  logic [2:0]      axil_dwidth_awprot;
+  logic            axil_dwidth_awvalid;
+  logic            axil_dwidth_awready;
+  logic            axil_dwidth_awlock;
+  logic [31:0]     axil_dwidth_wdata;
+  logic [7:0]      axil_dwidth_wstrb;
+  logic            axil_dwidth_wlast;
+  logic            axil_dwidth_wvalid;
+  logic            axil_dwidth_wready;
+  logic [3:0]      axil_dwidth_bid;
+  logic [1:0]      axil_dwidth_bresp;
+  logic            axil_dwidth_bvalid;
+  logic            axil_dwidth_bready;
+  logic [3:0]      axil_dwidth_arid;
+  logic [7:0]      axil_dwidth_arlen;
+  logic [2:0]      axil_dwidth_arsize;
+  logic [1:0]      axil_dwidth_arburst;
+  logic [2:0]      axil_dwidth_arprot;
+  logic [3:0]      axil_dwidth_arcache;
+  logic            axil_dwidth_arvalid;
+  logic [31:0]     axil_dwidth_araddr;
+  logic            axil_dwidth_arlock;
+  logic            axil_dwidth_arready;
+  logic [3:0]      axil_dwidth_rid;
+  logic [31:0]     axil_dwidth_rdata;
+  logic [1:0]      axil_dwidth_rresp;
+  logic            axil_dwidth_rvalid;
+  logic            axil_dwidth_rlast;
+  logic            axil_dwidth_rready;
+
+  // AXI Signals going out of protocol converter
   logic [31:0]     axil_awaddr;
   logic [2:0]      axil_awprot;
   logic            axil_awvalid;
@@ -586,43 +631,92 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
     .m_axi_arprot(axil_arprot),
     .m_axi_arvalid(axil_arvalid),
     .m_axi_arready(axil_arready),
-    .m_axi_rdata({32'b0, axil_rdata[31:0]}),
+    .m_axi_rdata(axil_rdata),
     .m_axi_rresp(axil_rresp),
     .m_axi_rvalid(axil_rvalid),
     .m_axi_rready(axil_rready));
 
-  axi_ethernet axi_ethernet (
+  axi_dwidth_conv_64to32 down_converter (
     .s_axi_aclk(CPUCLK),
-    .s_axi_aresetn(1'b1),
-    .ip2intc_irpt(),
-    .s_axi_awaddr(axil_awaddr[12:0]),
+    .s_axi_aresetn(peripheral_aresetn),
+    .s_axi_awaddr(axil_awaddr),
+    .s_axi_awprot(axil_awprot),
     .s_axi_awvalid(axil_awvalid),
     .s_axi_awready(axil_awready),
-    .s_axi_wdata(axil_wdata[31:0]),
-    .s_axi_wstrb(axil_wstrb[3:0]),
+    .s_axi_wdata(axil_wdata),
+    .s_axi_wstrb(axil_wstrb),
     .s_axi_wvalid(axil_wvalid),
     .s_axi_wready(axil_wready),
     .s_axi_bresp(axil_bresp),
     .s_axi_bvalid(axil_bvalid),
     .s_axi_bready(axil_bready),
-    .s_axi_araddr(axil_araddr[12:0]),
+    .s_axi_araddr(axil_araddr),
+    .s_axi_arprot(axil_arprot),
     .s_axi_arvalid(axil_arvalid),
     .s_axi_arready(axil_arready),
-    .s_axi_rdata(axil_rdata[31:0]),
+    .s_axi_rdata(axil_rdata),
     .s_axi_rresp(axil_rresp),
     .s_axi_rvalid(axil_rvalid),
     .s_axi_rready(axil_rready),
-    .phy_tx_clk(phy_tx_clk),        // input wire phy_tx_clk
-    .phy_rx_clk(phy_rx_clk),        // input wire phy_rx_clk
-    .phy_crs(phy_crs),              // input wire phy_crs
-    .phy_dv(phy_rx_dv),                // input wire phy_dv
-    .phy_rx_data(phy_rxd),      // input wire [3 : 0] phy_rx_data
-    .phy_col(phy_col),              // input wire phy_col
-    .phy_rx_er(phy_rx_er),          // input wire phy_rx_er
-    .phy_rst_n(phy_reset_n),          // output wire phy_rst_n
-    .phy_tx_en(phy_tx_en),          // output wire phy_tx_en
-    .phy_tx_data(phy_txd)      // output wire [3 : 0] phy_tx_data
+    .m_axi_awaddr(axil_dwidth_awaddr),
+    .m_axi_awprot(axil_dwidth_awprot),
+    .m_axi_awvalid(axil_dwidth_awvalid),
+    .m_axi_awready(axil_dwidth_awready),
+    .m_axi_wdata(axil_dwidth_wdata),
+    .m_axi_wstrb(axil_dwidth_wstrb),
+    .m_axi_wvalid(axil_dwidth_wvalid),
+    .m_axi_wready(axil_dwidth_wready),
+    .m_axi_bresp(axil_dwidth_bresp),
+    .m_axi_bvalid(axil_dwidth_bvalid),
+    .m_axi_bready(axil_dwidth_bready),
+    .m_axi_araddr(axil_dwidth_araddr),
+    .m_axi_arprot(axil_dwidth_arprot),
+    .m_axi_arvalid(axil_dwidth_arvalid),
+    .m_axi_arready(axil_dwidth_arready),
+    .m_axi_rdata(axil_dwidth_rdata),
+    .m_axi_rresp(axil_dwidth_rresp),
+    .m_axi_rvalid(axil_dwidth_rvalid),
+    .m_axi_rready(axil_dwidth_rready)
   );
+
+  axi_ethernet axi_ethernet (
+    .s_axi_aclk(CPUCLK),
+    .s_axi_aresetn(1'b1),
+    .ip2intc_irpt(ip2intc_irpt),
+    .s_axi_awaddr(axil_dwidth_awaddr[12:0]),
+    .s_axi_awvalid(axil_dwidth_awvalid),
+    .s_axi_awready(axil_dwidth_awready),
+    .s_axi_wdata(axil_dwidth_wdata),
+    .s_axi_wstrb(axil_dwidth_wstrb),
+    .s_axi_wvalid(axil_dwidth_wvalid),
+    .s_axi_wready(axil_dwidth_wready),
+    .s_axi_bresp(axil_dwidth_bresp),
+    .s_axi_bvalid(axil_dwidth_bvalid),
+    .s_axi_bready(axil_dwidth_bready),
+    .s_axi_araddr(axil_dwidth_araddr[12:0]),
+    .s_axi_arvalid(axil_dwidth_arvalid),
+    .s_axi_arready(axil_dwidth_arready),
+    .s_axi_rdata(axil_dwidth_rdata),
+    .s_axi_rresp(axil_dwidth_rresp),
+    .s_axi_rvalid(axil_dwidth_rvalid),
+    .s_axi_rready(axil_dwidth_rready),
+    .phy_tx_clk(phy_tx_clk),
+    .phy_rx_clk(phy_rx_clk),
+    .phy_crs(phy_crs),
+    .phy_dv(phy_rx_dv),
+    .phy_rx_data(phy_rxd_2),
+    .phy_col(phy_col),
+    .phy_rx_er(phy_rx_er),
+    .phy_rst_n(phy_reset_n),
+    .phy_tx_en(phy_tx_en),
+    .phy_tx_data(phy_txd),
+    .phy_mdio_i(phy_mdio_i),
+    .phy_mdio_o(phy_mdio_o),
+    .phy_mdio_t(phy_mdio_t),
+    .phy_mdc(phy_mdc)
+  );
+
+  IOBUF mdio_iobuf (.O(phy_mdio_o), .IO(phy_mdio), .I(phy_mdio_i), .T(phy_mdio_t));
 
   //  AXI Clock Converter
   clkconverter clkconverter
