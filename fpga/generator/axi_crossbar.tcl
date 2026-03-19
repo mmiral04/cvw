@@ -16,7 +16,7 @@ set_property board_part $boardName [current_project]
 
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name $ipName
 
-set_property -dict [list CONFIG.NUM_SI {2} \
+set_property -dict [list CONFIG.NUM_SI {1} \
                         CONFIG.DATA_WIDTH {64} \
                         CONFIG.ID_WIDTH {4} \
                         CONFIG.M00_A00_BASE_ADDR {0x0000000080000000} \

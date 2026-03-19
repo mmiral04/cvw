@@ -87,14 +87,6 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
    output logic [0:0]    ddr3_odt
    );
 
-  logic [3:0] phy_rxd_2;
-  assign phy_rxd = phy_rxd_2;
-  assign led5 = phy_crs;
-  assign led6 = phy_rx_dv;
-  assign led7 = phy_rx_er;
-  logic ip2intc_irpt;
-  assign led4 = ip2intc_irpt;
-
   // MMCM Signals
   logic          CPUCLK;
   logic          c0_ddr4_ui_clk_sync_rst;
@@ -492,46 +484,46 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
     (.aclk(CPUCLK),
      // Connect managers
      .aresetn(peripheral_aresetn),
-     .s_axi_awid({4'b0, m0_axi_awid}),
-     .s_axi_awlen({8'b0, m0_axi_awlen}),
-     .s_axi_awsize({3'b0, m0_axi_awsize}),
-     .s_axi_awburst({2'b0, m0_axi_awburst}),
-     .s_axi_awcache({4'b0, m0_axi_awcache}),
-     .s_axi_awaddr({32'b0, m0_axi_awaddr}),
-     .s_axi_awprot({2'b0, m0_axi_awprot}),
-     .s_axi_awvalid({1'b0, m0_axi_awvalid}),
+     .s_axi_awid(m0_axi_awid),
+     .s_axi_awlen(m0_axi_awlen),
+     .s_axi_awsize(m0_axi_awsize),
+     .s_axi_awburst(m0_axi_awburst),
+     .s_axi_awcache(m0_axi_awcache),
+     .s_axi_awaddr(m0_axi_awaddr),
+     .s_axi_awprot(m0_axi_awprot),
+     .s_axi_awvalid(m0_axi_awvalid),
      .s_axi_awready(m0_axi_awready),
 
-     .s_axi_awlock({1'b0, m0_axi_awlock}),
-     .s_axi_awqos(8'b0),
-     .s_axi_wdata({64'b0, m0_axi_wdata}),
-     .s_axi_wstrb({8'b0, m0_axi_wstrb}),
-     .s_axi_wlast({1'b0, m0_axi_wlast}),
-     .s_axi_wvalid({1'b0, m0_axi_wvalid}),
+     .s_axi_awlock(m0_axi_awlock),
+     .s_axi_awqos(4'b0),
+     .s_axi_wdata(m0_axi_wdata),
+     .s_axi_wstrb(m0_axi_wstrb),
+     .s_axi_wlast(m0_axi_wlast),
+     .s_axi_wvalid(m0_axi_wvalid),
      .s_axi_wready(m0_axi_wready),
 
      .s_axi_bid(m0_axi_bid),
      .s_axi_bresp(m0_axi_bresp),
      .s_axi_bvalid(m0_axi_bvalid),
-     .s_axi_bready({1'b0, m0_axi_bready}),
-     .s_axi_arid({4'b0, m0_axi_arid}),
-     .s_axi_arlen({8'b0, m0_axi_arlen}),
-     .s_axi_arsize({3'b0, m0_axi_arsize}),
-     .s_axi_arburst({2'b0, m0_axi_arburst}),
-     .s_axi_arprot({3'b0, m0_axi_arprot}),
-     .s_axi_arcache({4'b0, m0_axi_arcache}),
-     .s_axi_arvalid({1'b0, m0_axi_arvalid}),
-     .s_axi_araddr({32'b0, m0_axi_araddr}),
-     .s_axi_arlock({1'b0, m0_axi_arlock}),
+     .s_axi_bready(m0_axi_bready),
+     .s_axi_arid(m0_axi_arid),
+     .s_axi_arlen(m0_axi_arlen),
+     .s_axi_arsize(m0_axi_arsize),
+     .s_axi_arburst(m0_axi_arburst),
+     .s_axi_arprot(m0_axi_arprot),
+     .s_axi_arcache(m0_axi_arcache),
+     .s_axi_arvalid(m0_axi_arvalid),
+     .s_axi_araddr(m0_axi_araddr),
+     .s_axi_arlock(m0_axi_arlock),
      .s_axi_arready(m0_axi_arready),
-     .s_axi_arqos(8'b0),
+     .s_axi_arqos(4'b0),
 
      .s_axi_rid(m0_axi_rid),
      .s_axi_rdata(m0_axi_rdata),
      .s_axi_rresp(m0_axi_rresp),
      .s_axi_rvalid(m0_axi_rvalid),
      .s_axi_rlast(m0_axi_rlast),
-     .s_axi_rready({1'b0, m0_axi_rready}),
+     .s_axi_rready(m0_axi_rready),
 
      // Connect subordinates
      .m_axi_awid({XBAR_m01_axi_awid, XBAR_m00_axi_awid}),
@@ -704,7 +696,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
     .phy_rx_clk(phy_rx_clk),
     .phy_crs(phy_crs),
     .phy_dv(phy_rx_dv),
-    .phy_rx_data(phy_rxd_2),
+    .phy_rx_data(phy_rxd),
     .phy_col(phy_col),
     .phy_rx_er(phy_rx_er),
     .phy_rst_n(phy_reset_n),
