@@ -1,7 +1,7 @@
 ///////////////////////////////////////////
 // 7seg_apb.sv
 //
-// Written: mmiral04@ucm.es 19 February 2026
+// Written: mariomiralles04@gmail.com 19 February 2026
 // Modified:
 //
 // Purpose: Seven Segment Display peripheral
@@ -28,7 +28,7 @@
 // and limitations under the License.
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-module display_apb import cvw::*; #(parameter cvw_t P) (
+module ssd_apb import cvw::*; #(parameter cvw_t P) (
   input  logic                PCLK, PRESETn,
   input  logic                PSEL,
   input  logic [3:0]          PADDR,
