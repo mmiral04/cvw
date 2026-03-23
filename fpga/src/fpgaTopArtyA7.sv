@@ -118,6 +118,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
   logic [31:0]    GPIOIN, GPIOOUT, GPIOEN;
 
   // Ethernet Signals
+  logic            ETHIntr;
   logic            phy_mdio_i, phy_mdio_o, phy_mdio_t;
 
   // AHB to AXI Bridge Signals
@@ -425,7 +426,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
                     .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT,
                     .HTRANS, .HMASTLOCK, .HREADY, .TIMECLK(1'b0),
                     .GPIOIN, .GPIOOUT, .GPIOEN,
-                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall));
+                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ETHIntr, .ExternalStall(RVVIStall));
 
 
   // ahb lite to axi bridge
@@ -674,7 +675,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
   axi_ethernet axi_ethernet (
     .s_axi_aclk(CPUCLK),
     .s_axi_aresetn(1'b1),
-    .ip2intc_irpt(ip2intc_irpt),
+    .ip2intc_irpt(ETHIntr),
     .s_axi_awaddr(axil_dwidth_awaddr[12:0]),
     .s_axi_awvalid(axil_dwidth_awvalid),
     .s_axi_awready(axil_dwidth_awready),
