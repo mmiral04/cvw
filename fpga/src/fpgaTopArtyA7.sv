@@ -49,11 +49,8 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
    input logic         SDCCD,
    input logic         SDCWP,
 
-  // LED
-   output logic        led1,
-   output logic        led2,
-   output logic        led3,
-   output logic        led4,
+  // PMOD SSD
+   output logic [7:0]  ssd_signals,
  /*
      * Ethernet: 100BASE-T MII
      */
@@ -115,9 +112,6 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
 
   // GPIO Signals
   logic [31:0]    GPIOIN, GPIOOUT, GPIOEN;
-
-  // LEDs
-  logic [3:0]      leds;
 
   // AHB to AXI Bridge Signals
   logic [3:0]      m_axi_awid;
@@ -267,12 +261,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
                     .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT,
                     .HTRANS, .HMASTLOCK, .HREADY, .TIMECLK(1'b0),
                     .GPIOIN, .GPIOOUT, .GPIOEN,
-                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall), .leds);
-
-  assign led1 = leds[0];
-  assign led2 = leds[1];
-  assign led3 = leds[2];
-  assign led4 = leds[3];
+                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall), .ssd_signals);
 
   // ahb lite to axi bridge
   ahbaxibridge ahbaxibridge

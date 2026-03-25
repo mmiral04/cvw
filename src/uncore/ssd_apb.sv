@@ -38,20 +38,17 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
   input  logic                PENABLE,
   output logic [P.XLEN-1:0]   PRDATA,
   output logic                PREADY,
-  output logic [3:0]          leds
+  output logic [7:0]          ssd_signals
 );
 
   // register map
-  localparam LED_1 = 4'h0;
-  localparam LED_2 = 4'h4;
-  localparam LED_3 = 4'h8;
-  localparam LED_4 = 4'hC;
+  localparam SEGMENTS_REGISTER = 4'h4;
+  localparam SELECT_REGISTER = 4'h0;
 
   logic       memwrite;
-  logic [3:0] led_registers;
-  logic [3:0] entry;
-
-  assign leds = led_registers;
+  logic [6:0] segments;
+  logic       SEL0, SEL1;
+  logic [2:0] entry;
 
   assign entry = {PADDR[3:2], 2'b00};        // 32-bit word-aligned address
   assign memwrite = PWRITE & PENABLE & PSEL; // only write in access phase
@@ -60,21 +57,32 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
   // register access
   always_ff @(posedge PCLK) begin: read_register
     case(entry)
-      LED_1: PRDATA <= led_registers[0];
-      LED_2: PRDATA <= led_registers[1];
-      LED_3: PRDATA <= led_registers[2];
-      LED_4: PRDATA <= led_registers[3];
+      SEGMENTS_REGISTER: PRDATA <= segments[6:0];
+      SELECT_REGISTER:   PRDATA <= 2'd3;
+      default: PRDATA <= 2'b10;
     endcase
   end
 
   always_ff @(posedge PCLK) begin: write_register
-    if (~PRESETn) led_registers <= 4'b0000;
+    if (~PRESETn) begin
+      segments = 'b0;
+      SEL0 = 'b0;
+      SEL1 = 'b0;
+    end
     else if (memwrite)
       case(entry)
-        LED_1: led_registers[0] <= PWDATA[0];
-        LED_2: led_registers[1] <= PWDATA[0];
-        LED_3: led_registers[2] <= PWDATA[0];
-        LED_4: led_registers[3] <= PWDATA[0];
+        SEGMENTS_REGISTER: segments <= PWDATA[6:0];
+        SELECT_REGISTER: begin
+          SEL0 <= PWDATA[0];
+          SEL1 <= PWDATA[1];
+        end
       endcase
   end
+
+  // Seven Segment Display control logic
+
+  // If Display 0 is selected, C must be 0. If Display 1 is selected, C must be 1.
+  // If both are selected, output a 0 but turn off all segments
+  assign ssd_signals[7] = ~SEL0 & SEL1;
+  assign ssd_signals[6:0] = (SEL0 ^ SEL1) ? segments[6:0] : 'b0;
 endmodule
