@@ -145,9 +145,9 @@ typedef struct packed {
   logic         SPI_SUPPORTED;
   logic [63:0]  SPI_BASE;
   logic [63:0]  SPI_RANGE;
-  logic         DISP_SUPPORTED;
-  logic [63:0]  DISP_BASE;
-  logic [63:0]  DISP_RANGE;
+  logic         SSD_SUPPORTED;
+  logic [63:0]  SSD_BASE;
+  logic [63:0]  SSD_RANGE;
 
 // Test modes
 

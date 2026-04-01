@@ -31,7 +31,7 @@
 module ssd_apb import cvw::*; #(parameter cvw_t P) (
   input  logic                PCLK, PRESETn,
   input  logic                PSEL,
-  input  logic [3:0]          PADDR,
+  input  logic [2:0]          PADDR,
   input  logic [P.XLEN-1:0]   PWDATA,
   input  logic [P.XLEN/8-1:0] PSTRB,
   input  logic                PWRITE,
@@ -42,24 +42,30 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
 );
 
   // register map
-  localparam SEGMENTS_REGISTER = 4'h4;
-  localparam SELECT_REGISTER = 4'h0;
+  localparam SEGMENTS_REGISTER = 3'h0;
+  localparam SELECT_REGISTER = 3'h4;
 
   logic       memwrite;
   logic [6:0] segments;
   logic       SEL0, SEL1;
   logic [2:0] entry;
+  logic [31:0] Din, Dout;
 
-  assign entry = {PADDR[3:2], 2'b00};        // 32-bit word-aligned address
+  assign entry = {PADDR[2], 2'b00};        // 32-bit word-aligned address
   assign memwrite = PWRITE & PENABLE & PSEL; // only write in access phase
   assign PREADY = 1'b1;                      // responses never take more than 1 cycle
+
+  // account for subword read/write circuitry
+  // -- Note SSD registers are 32 bits no matter what; access them with LW SW.
+  assign Din = PWDATA[31:0];
+  if (P.XLEN == 64) assign PRDATA = {Dout, Dout};
+  else              assign PRDATA = Dout;
 
   // register access
   always_ff @(posedge PCLK) begin: read_register
     case(entry)
-      SEGMENTS_REGISTER: PRDATA <= segments[6:0];
-      SELECT_REGISTER:   PRDATA <= 2'd3;
-      default: PRDATA <= 2'b10;
+      SEGMENTS_REGISTER: Dout <= segments[6:0];
+      SELECT_REGISTER:   Dout <= {SEL1, SEL0};
     endcase
   end
 
@@ -71,10 +77,10 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
     end
     else if (memwrite)
       case(entry)
-        SEGMENTS_REGISTER: segments <= PWDATA[6:0];
+        SEGMENTS_REGISTER: segments <= Din[6:0];
         SELECT_REGISTER: begin
-          SEL0 <= PWDATA[0];
-          SEL1 <= PWDATA[1];
+          SEL0 <= Din[0];
+          SEL1 <= Din[1];
         end
       endcase
   end
