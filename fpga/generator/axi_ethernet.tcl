@@ -17,7 +17,7 @@ set_property board_part $boardName [current_project]
 create_ip -name axi_ethernetlite -vendor xilinx.com -library ip -version 3.0 -module_name $ipName
 
 set_property -dict [list CONFIG.C_INCLUDE_GLOBAL_BUFFERS {1} \
-                         CONFIG.C_INCLUDE_MDIO {1} \
+                         CONFIG.C_INCLUDE_MDIO {0} \
                          CONFIG.AXI_ACLK_FREQ_MHZ {20} \
                          CONFIG.MDIO_BOARD_INTERFACE {eth_mdio_mdc} \
                          CONFIG.MII_BOARD_INTERFACE {eth_mii}] [get_ips $ipName]
