@@ -42,14 +42,30 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
 );
 
   // register map
-  localparam SEGMENTS_REGISTER = 3'h0;
-  localparam SELECT_REGISTER = 3'h4;
+  localparam LEFT_REGISTER = 3'h0;
+  localparam RIGHT_REGISTER = 3'h4;
 
   logic       memwrite;
-  logic [6:0] segments;
-  logic       SEL0, SEL1;
+  logic [6:0] left_segments, right_segments;
   logic [2:0] entry;
   logic [31:0] Din, Dout;
+
+  logic       toggle;
+
+  // Clock speed is divided by half to get better results.
+  logic [1:0] clkcounter;
+  logic       clk10Mhz;
+
+  always_ff @(posedge PCLK) begin: clock_counter
+    if (~PRESETn) clkcounter <= 'b0;
+    else if (clkcounter == {2{1'b1}}) clkcounter <= 'b0;
+    else clkcounter <= clkcounter + 1;
+  end
+
+  always_ff @(posedge PCLK) begin: clock_divider
+    if (~PRESETn) clk10Mhz <= 0;
+    else if (clkcounter == {2{1'b1}}) clk10Mhz <= ~clk10Mhz;
+  end
 
   assign entry = {PADDR[2], 2'b00};        // 32-bit word-aligned address
   assign memwrite = PWRITE & PENABLE & PSEL; // only write in access phase
@@ -64,31 +80,38 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
   // register access
   always_ff @(posedge PCLK) begin: read_register
     case(entry)
-      SEGMENTS_REGISTER: Dout <= segments[6:0];
-      SELECT_REGISTER:   Dout <= {SEL1, SEL0};
+      LEFT_REGISTER:     Dout <= left_segments[6:0];
+      RIGHT_REGISTER:    Dout <= right_segments[6:0];
     endcase
   end
 
   always_ff @(posedge PCLK) begin: write_register
     if (~PRESETn) begin
-      segments = 'b0;
-      SEL0 = 'b0;
-      SEL1 = 'b0;
+      left_segments = 'b0;
+      right_segments = 'b0;
     end
     else if (memwrite)
       case(entry)
-        SEGMENTS_REGISTER: segments <= Din[6:0];
-        SELECT_REGISTER: begin
-          SEL0 <= Din[0];
-          SEL1 <= Din[1];
-        end
+        LEFT_REGISTER:  left_segments <= Din[6:0];
+        RIGHT_REGISTER: right_segments <= Din[6:0];
       endcase
   end
 
   // Seven Segment Display control logic
+  // The driver switches the select signal of the SSD (7th bit) at a speed of 10Mhz
+  // To turn both displays at the same time.
+  assign ssd_signals[7] = toggle;
 
-  // If Display 0 is selected, C must be 0. If Display 1 is selected, C must be 1.
-  // If both are selected, output a 0 but turn off all segments
-  assign ssd_signals[7] = ~SEL0 & SEL1;
-  assign ssd_signals[6:0] = (SEL0 ^ SEL1) ? segments[6:0] : 'b0;
+  always_ff @(posedge clk10Mhz) begin: segments_register
+    if (~PRESETn) begin
+      ssd_signals[6:0] = 'b0;
+      toggle = 'b0;
+    end else begin
+      toggle <= ~toggle;
+      case (toggle)
+        1'b0: ssd_signals[6:0] <= left_segments[6:0];
+        1'b1: ssd_signals[6:0] <= right_segments[6:0];
+      endcase
+    end
+  end
 endmodule
