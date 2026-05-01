@@ -47,7 +47,12 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
    output logic        SDCCmd,
    output logic        SDCCS,
    input logic         SDCCD,
+   output logic        SD_RESET,
    //input logic         SDCWP, // No WP pin
+
+   // PMOD SSD
+   output logic [7:0]  ssd_segments,
+   output logic [7:0]  ssd_select,
 
 `ifdef RVVI_SYNTH_SUPPORTED
  /*
@@ -220,6 +225,7 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
 
   logic [3:0] SDCCSin;
   assign SDCCS = SDCCSin[0];
+  assign SD_RESET = 1'b0;
 
   // active high reset
   logic reset = ~resetn;
@@ -262,7 +268,8 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
                     .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT,
                     .HTRANS, .HMASTLOCK, .HREADY, .TIMECLK(1'b0),
                     .GPIOIN, .GPIOOUT, .GPIOEN,
-                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall));
+                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall),
+                    .ssd_segments, .ssd_select);
 
 
   // ahb lite to axi bridge

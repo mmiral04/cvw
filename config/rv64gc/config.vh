@@ -191,7 +191,7 @@ localparam logic [63:0] SPI_BASE         = 64'h10040000;
 localparam logic [63:0] SPI_RANGE        = 64'h00000FFF;
 localparam logic SSD_SUPPORTED = 0;
 localparam logic [63:0] SSD_BASE        = 64'h00100000;
-localparam logic [63:0] SSD_RANGE       = 64'h0010000F;
+localparam logic [63:0] SSD_RANGE       = 64'h001000FF;
 
 // Bus Interface width
 localparam AHBW = (XLEN);

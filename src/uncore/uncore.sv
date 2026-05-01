@@ -62,7 +62,8 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
   output logic                 SDCCmd,
   output logic [3:0]           SDCCS,
   output logic                 SDCCLK,
-  output logic [7:0]           ssd_signals
+  output logic [7:0]           ssd_segments,
+  output logic [7:0]           ssd_select
 );
 
   logic [P.XLEN-1:0]           HREADRam, HREADSDC;
@@ -178,11 +179,12 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
 
   if (P.SSD_SUPPORTED == 1) begin : seven_seg_display
     ssd_apb #(P) ssd_apb(
-      .PCLK, .PRESETn, .PSEL(PSEL[6]), .PADDR(PADDR[2:0]), .PWDATA, .PSTRB, .PWRITE, .PENABLE,
+      .PCLK, .PRESETn, .PSEL(PSEL[6]), .PADDR(PADDR[4:0]), .PWDATA, .PSTRB, .PWRITE, .PENABLE,
       .PREADY(PREADY[6]), .PRDATA(PRDATA[6]),
-      .ssd_signals);
+      .ssd_segments, .ssd_select);
   end else begin: seven_seg_display
     assign ssd_signals = '0;
+    assign ssd_select = '0;
   end
 
   // AHB Read Multiplexer

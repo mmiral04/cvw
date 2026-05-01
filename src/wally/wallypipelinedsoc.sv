@@ -64,7 +64,8 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
   output logic                SDCCmd,           // SDC CMD         from   SPI DO
   output logic [3:0]          SDCCS,            // SDC Card Detect from   SPI CS
   output logic                SDCCLK,            // SDC Clock       from   SPI Clock
-  output logic [7:0]          ssd_signals
+  output logic [7:0]          ssd_segments,
+  output logic [7:0]          ssd_select
   );
 
   // Uncore signals
@@ -90,10 +91,10 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
       .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT, .HTRANS, .HMASTLOCK, .HRDATAEXT,
       .HREADYEXT, .HRESPEXT, .HRDATA, .HREADY, .HRESP, .HSELEXT,
       .MTimerInt, .MSwInt, .MExtInt, .SExtInt, .GPIOIN, .GPIOOUT, .GPIOEN, .UARTSin,
-      .UARTSout, .MTIME_CLINT, .SPIIn, .SPIOut, .SPICS, .SPICLK, .SDCIn, .SDCCmd, .SDCCS, .SDCCLK, .ssd_signals);
+      .UARTSout, .MTIME_CLINT, .SPIIn, .SPIOut, .SPICS, .SPICLK, .SDCIn, .SDCCmd, .SDCCS, .SDCCLK, .ssd_segments, .ssd_select);
   end else begin
     assign {HRDATA, HREADY, HRESP, HSELEXT, MTimerInt, MSwInt, MExtInt, SExtInt,
-            MTIME_CLINT, GPIOOUT, GPIOEN, UARTSout, SPIOut, SPICS, SPICLK, SDCCmd, SDCCS, SDCCLK, ssd_signals} = '0;
+            MTIME_CLINT, GPIOOUT, GPIOEN, UARTSout, SPIOut, SPICS, SPICLK, SDCCmd, SDCCS, SDCCLK, ssd_segments, ssd_select} = '0;
   end
 
 

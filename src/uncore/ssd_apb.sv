@@ -31,43 +31,50 @@
 module ssd_apb import cvw::*; #(parameter cvw_t P) (
   input  logic                PCLK, PRESETn,
   input  logic                PSEL,
-  input  logic [2:0]          PADDR,
+  input  logic [4:0]          PADDR,
   input  logic [P.XLEN-1:0]   PWDATA,
   input  logic [P.XLEN/8-1:0] PSTRB,
   input  logic                PWRITE,
   input  logic                PENABLE,
   output logic [P.XLEN-1:0]   PRDATA,
   output logic                PREADY,
-  output logic [7:0]          ssd_signals
+  output logic [7:0]          ssd_segments,
+  output logic [7:0]          ssd_select
 );
 
   // register map
-  localparam LEFT_REGISTER = 3'h0;
-  localparam RIGHT_REGISTER = 3'h4;
+  localparam REG0 = 5'h0;
+  localparam REG1 = 5'h4;
+  localparam REG2 = 5'h8;
+  localparam REG3 = 5'hC;
+  localparam REG4 = 5'h10;
+  localparam REG5 = 5'h14;
+  localparam REG6 = 5'h18;
+  localparam REG7 = 5'h1C;
 
   logic       memwrite;
-  logic [6:0] left_segments, right_segments;
-  logic [2:0] entry;
+  logic [7:0][7:0] segments;
+  logic [4:0] entry;
   logic [31:0] Din, Dout;
 
-  logic       toggle;
+  logic [7:0] selected = 8'b11111110;
 
-  // Clock speed is divided by half to get better results.
-  logic [1:0] clkcounter;
-  logic       clk10Mhz;
+  // Clock speed is divided to 9KHz
+  logic [13:0] clkcounter;
+  logic       clk9KHz;
 
   always_ff @(posedge PCLK) begin: clock_counter
     if (~PRESETn) clkcounter <= 'b0;
-    else if (clkcounter == {2{1'b1}}) clkcounter <= 'b0;
+    else if (clkcounter == {14{1'b1}}) clkcounter <= 'b0;
     else clkcounter <= clkcounter + 1;
   end
 
   always_ff @(posedge PCLK) begin: clock_divider
-    if (~PRESETn) clk10Mhz <= 0;
-    else if (clkcounter == {2{1'b1}}) clk10Mhz <= ~clk10Mhz;
+    if (~PRESETn) clk9KHz <= 0;
+    else if (clkcounter == {14{1'b1}}) clk9KHz <= ~clk9KHz;
   end
 
-  assign entry = {PADDR[2], 2'b00};        // 32-bit word-aligned address
+  assign entry = {PADDR[4:2], 2'b00};        // 32-bit word-aligned address
   assign memwrite = PWRITE & PENABLE & PSEL; // only write in access phase
   assign PREADY = 1'b1;                      // responses never take more than 1 cycle
 
@@ -80,37 +87,65 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
   // register access
   always_ff @(posedge PCLK) begin: read_register
     case(entry)
-      LEFT_REGISTER:     Dout <= left_segments[6:0];
-      RIGHT_REGISTER:    Dout <= right_segments[6:0];
+      REG0: Dout <= ~segments[0][7:0];
+      REG1: Dout <= ~segments[1][7:0];
+      REG2: Dout <= ~segments[2][7:0];
+      REG3: Dout <= ~segments[3][7:0];
+      REG4: Dout <= ~segments[4][7:0];
+      REG5: Dout <= ~segments[5][7:0];
+      REG6: Dout <= ~segments[6][7:0];
+      REG7: Dout <= ~segments[7][7:0];
     endcase
   end
 
   always_ff @(posedge PCLK) begin: write_register
     if (~PRESETn) begin
-      left_segments = 'b0;
-      right_segments = 'b0;
+      segments[0] <= '1;
+      segments[1] <= '1;
+      segments[2] <= '1;
+      segments[3] <= '1;
+      segments[4] <= '1;
+      segments[5] <= '1;
+      segments[6] <= '1;
+      segments[7] <= '1;
     end
     else if (memwrite)
       case(entry)
-        LEFT_REGISTER:  left_segments <= Din[6:0];
-        RIGHT_REGISTER: right_segments <= Din[6:0];
+        REG0: segments[0][7:0] <= ~Din[7:0];
+        REG1: segments[1][7:0] <= ~Din[7:0];
+        REG2: segments[2][7:0] <= ~Din[7:0];
+        REG3: segments[3][7:0] <= ~Din[7:0];
+        REG4: segments[4][7:0] <= ~Din[7:0];
+        REG5: segments[5][7:0] <= ~Din[7:0];
+        REG6: segments[6][7:0] <= ~Din[7:0];
+        REG7: segments[7][7:0] <= ~Din[7:0];
       endcase
   end
 
   // Seven Segment Display control logic
-  // The driver switches the select signal of the SSD (7th bit) at a speed of 10Mhz
-  // To turn both displays at the same time.
-  assign ssd_signals[7] = toggle;
+  always_ff @(posedge clk9KHz) begin: shift_select
+    if (~PRESETn)
+      selected <= 8'b11111110;
+    else
+      selected <= {selected[6:0], selected[7]};
+  end
 
-  always_ff @(posedge clk10Mhz) begin: segments_register
-    if (~PRESETn) begin
-      ssd_signals[6:0] = 'b0;
-      toggle = 'b0;
-    end else begin
-      toggle <= ~toggle;
-      case (toggle)
-        1'b0: ssd_signals[6:0] <= left_segments[6:0];
-        1'b1: ssd_signals[6:0] <= right_segments[6:0];
+  assign ssd_select = selected;
+
+  always_ff @(posedge clk9KHz) begin: segments_register
+    if (~PRESETn)
+      ssd_segments[7:0] = 'b1;
+    else begin
+      case (selected)
+        8'b11111110: ssd_segments[7:0] <= segments[1][7:0];
+        8'b11111101: ssd_segments[7:0] <= segments[2][7:0];
+        8'b11111011: ssd_segments[7:0] <= segments[3][7:0];
+        8'b11110111: ssd_segments[7:0] <= segments[4][7:0];
+        8'b11101111: ssd_segments[7:0] <= segments[5][7:0];
+        8'b11011111: ssd_segments[7:0] <= segments[6][7:0];
+        8'b10111111: ssd_segments[7:0] <= segments[7][7:0];
+        8'b01111111: ssd_segments[7:0] <= segments[0][7:0];
+        default: ssd_segments = '1;
       endcase
     end
   end

@@ -50,7 +50,8 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
    input logic         SDCWP,
 
   // PMOD SSD
-   output logic [7:0]  ssd_signals,
+   output logic [7:0]  ssd_segments,
+   output logic [7:0]  ssd_select,
  /*
      * Ethernet: 100BASE-T MII
      */
@@ -261,7 +262,8 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
                     .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT,
                     .HTRANS, .HMASTLOCK, .HREADY, .TIMECLK(1'b0),
                     .GPIOIN, .GPIOOUT, .GPIOEN,
-                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall), .ssd_signals);
+                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall),
+                    .ssd_segments, .ssd_select);
 
   // ahb lite to axi bridge
   ahbaxibridge ahbaxibridge
