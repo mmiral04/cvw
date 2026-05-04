@@ -67,8 +67,6 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
     input logic        phy_col, // nc
     input logic        phy_crs, // nc
     output logic       phy_reset_n,
-    output logic       phy_mdc,
-    inout logic        phy_mdio,
 
    inout logic [15:0]    ddr3_dq,
    inout logic [1:0]     ddr3_dqs_n,
@@ -702,14 +700,8 @@ module fpgaTop #(parameter logic RVVI_SYNTH_SUPPORTED = 0)
     .phy_rx_er(phy_rx_er),
     .phy_rst_n(phy_reset_n),
     .phy_tx_en(phy_tx_en),
-    .phy_tx_data(phy_txd),
-    .phy_mdio_i(phy_mdio_i),
-    .phy_mdio_o(phy_mdio_o),
-    .phy_mdio_t(phy_mdio_t),
-    .phy_mdc(phy_mdc)
+    .phy_tx_data(phy_txd)
   );
-
-  IOBUF mdio_iobuf (.O(phy_mdio_o), .IO(phy_mdio), .I(phy_mdio_i), .T(phy_mdio_t));
 
   //  AXI Clock Converter
   clkconverter clkconverter
