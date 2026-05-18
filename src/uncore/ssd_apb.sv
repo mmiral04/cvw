@@ -59,9 +59,9 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
 
   logic [7:0] selected = 8'b11111110;
 
-  // Clock speed is divided to 9KHz
+  // Clock speed is divided with a 14-bit frequency divider
   logic [13:0] clkcounter;
-  logic       clk9KHz;
+  logic        clkDivider;
 
   always_ff @(posedge PCLK) begin: clock_counter
     if (~PRESETn) clkcounter <= 'b0;
@@ -70,8 +70,8 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
   end
 
   always_ff @(posedge PCLK) begin: clock_divider
-    if (~PRESETn) clk9KHz <= 0;
-    else if (clkcounter == {14{1'b1}}) clk9KHz <= ~clk9KHz;
+    if (~PRESETn) clkDivider <= 0;
+    else if (clkcounter == {14{1'b1}}) clkDivider <= ~clkDivider;
   end
 
   assign entry = {PADDR[4:2], 2'b00};        // 32-bit word-aligned address
@@ -123,7 +123,7 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
   end
 
   // Seven Segment Display control logic
-  always_ff @(posedge clk9KHz) begin: shift_select
+  always_ff @(posedge clkDivider) begin: shift_select
     if (~PRESETn)
       selected <= 8'b11111110;
     else
@@ -132,7 +132,7 @@ module ssd_apb import cvw::*; #(parameter cvw_t P) (
 
   assign ssd_select = selected;
 
-  always_ff @(posedge clk9KHz) begin: segments_register
+  always_ff @(posedge clkDivider) begin: segments_register
     if (~PRESETn)
       ssd_segments[7:0] = 'b1;
     else begin

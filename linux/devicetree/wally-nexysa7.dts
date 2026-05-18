@@ -51,6 +51,10 @@
     compatible = "simple-bus";
     ranges;
 
+    ssd: ssd@100000 {
+        reg = <0x00 0x100000 0x00 0x20>;
+    };
+
     refclk: refclk {
       #clock-cells = <0>;
       compatible = "fixed-clock";

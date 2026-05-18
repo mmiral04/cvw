@@ -183,7 +183,7 @@ module uncore import cvw::*;  #(parameter cvw_t P)(
       .PREADY(PREADY[6]), .PRDATA(PRDATA[6]),
       .ssd_segments, .ssd_select);
   end else begin: seven_seg_display
-    assign ssd_signals = '0;
+    assign ssd_segments = '0;
     assign ssd_select = '0;
   end
 
